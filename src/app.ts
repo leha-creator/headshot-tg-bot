@@ -12,6 +12,7 @@ import {registerScene} from "./scenes/register.scene";
 import {RegisterCommand} from "./commands/register.command";
 import {connect, model} from 'mongoose';
 import {UserSchema} from "./Models/User.model";
+import {MessageSchema} from "./Models/Message.model";
 
 class Bot {
     bot: Telegraf<IBotContext>;
@@ -39,22 +40,83 @@ class Bot {
             new RegisterCommand(this.bot),
         ];
 
-        this.bot.action('enter_register', (ctx) => {
-            ctx.scene.enter('register', {});
+        this.bot.action('bonuses_accrued', async (ctx: any, next: any) => {
+            const Message = model("Message", MessageSchema);
+            const message = await Message.findOne({message_id: ctx.update.callback_query.message.message_id});
+            console.log(message);
+            if (message && message.chat_id !== undefined) {
+                const User = model("User", UserSchema);
+                const user = await User.findOne({chat_id: message.chat_id});
+                if (user) {
+                    await this.bot.telegram.editMessageText(ctx.chat.id, ctx.update.callback_query.message.message_id, undefined, 'Пользователю ' + user.phone + ' зачислено ' + message.balance + ' бонусов ✅');
+                }
+            }
         });
 
-        this.bot.action('check', async (ctx: any) => {
+        this.bot.action('check', async (ctx: any, next: any) => {
             const chat_id = ctx.update.callback_query.from.id;
             const User = model("User", UserSchema);
             const user = await User.findOne({chat_id: chat_id});
             if (user) {
-                const chat_member = await ctx.getChatMember(chat_id, -1002268341872)
-
-                if (chat_member.status == 'left') {
-                    ctx.reply(`подпишись на канал`);
+                const chat_member = await this.bot.telegram.getChatMember(-1001634058732, chat_id);
+                if (chat_member.status == 'member') {
+                    const User = model("User", UserSchema);
+                    const ref_user = await User.findOne({ref_code: user.join_code});
+                    ctx.reply(`Поздравляем! Вы успешно подписались! 300 рублей скоро зачислятся на ваш бонусный счет. Пригласите друга по этой ссылке и получите еще 300 бонусных рублей, а ваш друг — 100₽! Реферальная ссылка: https://t.me/headshot_pc_bot?start=` + user.ref_code);
+                    if (ref_user && ref_user.ref_code !== undefined) {
+                        return ctx.telegram.sendMessage(ref_user.chat_id, 'Ура! 🎉 Ваш друг @' + user.name + ' зарегистрировался! 300 рублей скоро зачислятся на ваш бонусный счёт! 💰');
+                    }
+                    let message = "❗️Новый пользователь:\n" +
+                        "\n" +
+                        "Номер: " + user.phone + "\n" +
+                        "ID: @" + user.name + "\n" +
+                        "Начислить бонусов: 300\n";
+                    let balance = 300;
+                    if (ref_user && ref_user.ref_code !== undefined) {
+                        message = "❗️Новый пользователь по приглашению:\n" +
+                            "\n" +
+                            "Номер: " + user.phone + "\n" +
+                            "ID: @" + user.name + "\n" +
+                            "Начислить бонусов: 400\n";
+                        balance = 400;
+                        const admin_message = "❗ Пригласивший пользователь:\n" +
+                            "Номер: " + ref_user.phone + "\n" +
+                            "ID: @" + ref_user.name + "\n" +
+                            "Начислить бонусов: 300\n";
+                        ctx.telegram.sendMessage(-4610945060, admin_message, {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [
+                                        {
+                                            text: "✅ Начислено",
+                                            callback_data: 'bonuses_accrued',
+                                        },
+                                    ],
+                                ],
+                            },
+                        }).then((textMessage: any) => {
+                            const Message = model("Message", MessageSchema);
+                            Message.create({chat_id: ref_user.chat_id, message_id: textMessage.message_id, balance: 300});
+                        });
+                    }
+                    ctx.telegram.sendMessage(-4610945060, message, {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    {
+                                        text: "✅ Начислено",
+                                        callback_data: 'bonuses_accrued',
+                                    },
+                                ],
+                            ],
+                        },
+                    }).then((textMessage: any) => {
+                        const Message = model("Message", MessageSchema);
+                        Message.create({chat_id: chat_id, message_id: textMessage.message_id, balance: balance});
+                        next();
+                    });
                 } else {
-                    ctx.reply(`Вы подписаны бонусы начисляться в ближайшее время, реферальная ссылка: https://t.me/headshot_pc_bot?start=` + user.ref_code);
-                    ctx.telegram.sendMessage(-1002301958705, 'Новый пользователь: номер - ' + user.phone + ' id: @' + user.name);
+                    return ctx.reply(`Вы не подписались на канал!`).then(() => next());
                 }
             }
         });
