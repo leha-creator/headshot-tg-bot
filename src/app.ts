@@ -77,12 +77,12 @@ class Bot {
                             "\n" +
                             "Номер: " + user.phone + "\n" +
                             "ID: @" + user.name + "\n" +
-                            "Начислить бонусов: 400\n";
-                        balance = 400;
+                            "Начислить бонусов: 450\n";
+                        balance = 450;
                         const admin_message = "❗ Пригласивший пользователь:\n" +
                             "Номер: " + ref_user.phone + "\n" +
                             "ID: @" + ref_user.name + "\n" +
-                            "Начислить бонусов: 300\n";
+                            "Начислить бонусов: 150\n";
                         ctx.telegram.sendMessage(-4610945060, admin_message, {
                             reply_markup: {
                                 inline_keyboard: [
@@ -96,7 +96,7 @@ class Bot {
                             },
                         }).then((textMessage: any) => {
                             const Message = model("Message", MessageSchema);
-                            Message.create({chat_id: ref_user.chat_id, message_id: textMessage.message_id, balance: 300});
+                            Message.create({chat_id: ref_user.chat_id, message_id: textMessage.message_id, balance: 150});
                         });
                     }
                     ctx.telegram.sendMessage(-4610945060, message, {
