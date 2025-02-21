@@ -21,7 +21,6 @@ export const registerScene = composeWizardScene(
             }
         }
         const ref_code = crypto.webcrypto.getRandomValues(new Uint32Array(1)).toString();
-        console.log(ctx.message);
         await updateOrInsert({
             chat_id: ctx.message.chat.id,
             name: ctx.message.from.username,
@@ -92,17 +91,18 @@ export const registerScene = composeWizardScene(
     },
     async (ctx: any, done: () => any) => {
         if (typeof ctx.update.callback_query !== 'undefined') {
+            console.log(ctx.update.callback_query.message.from);
             if (ctx.wizard.state.phone) {
                 const ref_code = crypto.webcrypto.getRandomValues(new Uint32Array(1)).toString();
                 await updateOrInsert({
                     phone: ctx.wizard.state.phone,
-                    chat_id: ctx.update.callback_query.message.chat.id,
-                    name: ctx.update.callback_query.message.from.username,
+                    chat_id: ctx.update.callback_query.from.id,
+                    name: ctx.update.callback_query.from.username,
                     city: ctx.update.callback_query.data,
                     ref_code,
                 });
 
-                const chat_id = ctx.update.callback_query.message.chat.id;
+                const chat_id = ctx.update.callback_query.from.id;
                 const User = model("User", UserSchema);
                 const user = await User.findOne({chat_id: chat_id});
                 if (user) {
