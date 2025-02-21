@@ -13,7 +13,7 @@ export interface IUser
 export const UserSchema = new Schema<IUser>
 ({
     id: { type: Number, required: false },
-    name: { type: String, required: true },
+    name: { type: String, required: false },
     chat_id: { type: Number, required: true },
     phone: { type: Number, required: false },
     join_code: { type: String, required: false },
