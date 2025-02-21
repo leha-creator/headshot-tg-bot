@@ -8,6 +8,7 @@ import {MessageSchema} from "../Models/Message.model";
 
 export const registerScene = composeWizardScene(
     async (ctx) => {
+        ctx.wizard.state.phone = null;
         let join_code = '';
         let ref_user_name = '';
         const ref_user_code = ctx.session.ref_code;
@@ -25,6 +26,7 @@ export const registerScene = composeWizardScene(
             chat_id: ctx.message.chat.id,
             name: ctx.message.from.username,
             ref_code: ref_code,
+            city: undefined,
             join_code: join_code
         });
 
@@ -51,16 +53,52 @@ export const registerScene = composeWizardScene(
         } catch (e: any) {
             logger.info(e.message);
         }
+
+        return ctx.wizard.next();
+    },
+    async (ctx: any) => {
+        if (typeof ctx.message !== 'undefined' && typeof ctx.message.contact !== 'undefined') {
+            if (ctx.message.contact.phone_number) {
+                ctx.wizard.state.phone = ctx.message.contact.phone_number;
+                ctx.reply('Выберите город:', {
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{text: "Ульяновск", callback_data: "Ульяновск"}],
+                            [{text: "Димитровград", callback_data: "Димитровград"}],
+                        ]
+                    }
+                });
+            }
+        } else {
+            ctx.reply('Нет телефона', {
+                reply_markup: {
+                    keyboard: [
+                        [
+                            {
+                                text: "Отправить телефон",
+                                request_contact: true,
+                            },
+                        ],
+                    ],
+                },
+                parse_mode: 'MarkdownV2',
+                disable_web_page_preview: true,
+            });
+
+            return ctx.wizard.steps[0](ctx);
+        }
+
         return ctx.wizard.next();
     },
     async (ctx: any, done: () => any) => {
-        if (typeof ctx.message !== 'undefined' && typeof ctx.message.contact !== 'undefined') {
-            if (ctx.message.contact.phone_number) {
+        if (typeof ctx.message !== 'undefined') {
+            if (ctx.wizard.state.phone) {
                 const ref_code = crypto.webcrypto.getRandomValues(new Uint32Array(1)).toString();
                 await updateOrInsert({
-                    phone: ctx.message.contact.phone_number,
+                    phone: ctx.wizard.state.phone,
                     chat_id: ctx.message.chat.id,
                     name: ctx.message.from.username,
+                    city: ctx.message.text,
                     ref_code,
                 });
 
@@ -81,6 +119,7 @@ export const registerScene = composeWizardScene(
                             "\n" +
                             "Номер: " + user.phone + "\n" +
                             "ID: @" + user.name + "\n" +
+                            "Город: " + (user.city ?? 'Не указан') + "\n" +
                             "Начислить бонусов: 300\n";
                         let balance = 300;
                         if (ref_user && ref_user.ref_code !== undefined) {
@@ -88,11 +127,13 @@ export const registerScene = composeWizardScene(
                                 "\n" +
                                 "Номер: " + user.phone + "\n" +
                                 "ID: @" + user.name + "\n" +
+                                "Город: " + (user.city ?? 'Не указан') + "\n" +
                                 "Начислить бонусов: 450\n";
                             balance = 450;
                             const admin_message = "❗ Пригласивший пользователь:\n" +
                                 "Номер: " + ref_user.phone + "\n" +
                                 "ID: @" + ref_user.name + "\n" +
+                                "Город: " + (ref_user.city ?? 'Не указан') + "\n" +
                                 "Начислить бонусов: 150\n";
                             ctx.telegram.sendMessage(-1002424442799, admin_message, {
                                 reply_markup: {
@@ -130,12 +171,12 @@ export const registerScene = composeWizardScene(
                 }
             }
         } else {
-            ctx.reply('Нет телефона', {
+            ctx.reply('Произошла ошибка', {
                 reply_markup: {
                     keyboard: [
                         [
                             {
-                                text: "Отправить телефон",
+                                text: "Сначала",
                                 request_contact: true,
                             },
                         ],

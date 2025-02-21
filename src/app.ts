@@ -70,6 +70,7 @@ class Bot {
                         "\n" +
                         "Номер: " + user.phone + "\n" +
                         "ID: @" + user.name + "\n" +
+                        "Город: " + (user.city ?? 'Не указан') + "\n" +
                         "Начислить бонусов: 300\n";
                     let balance = 300;
                     if (ref_user && ref_user.ref_code !== undefined) {
@@ -77,11 +78,13 @@ class Bot {
                             "\n" +
                             "Номер: " + user.phone + "\n" +
                             "ID: @" + user.name + "\n" +
+                            "Город: " + (user.city ?? 'Не указан') + "\n" +
                             "Начислить бонусов: 450\n";
                         balance = 450;
                         const admin_message = "❗ Пригласивший пользователь:\n" +
                             "Номер: " + ref_user.phone + "\n" +
                             "ID: @" + ref_user.name + "\n" +
+                            "Город: " + (ref_user.city ?? 'Не указан') + "\n" +
                             "Начислить бонусов: 150\n";
                         ctx.telegram.sendMessage(-1002424442799, admin_message, {
                             reply_markup: {
