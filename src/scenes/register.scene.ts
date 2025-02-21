@@ -94,7 +94,7 @@ export const registerScene = composeWizardScene(
                                 "Номер: " + ref_user.phone + "\n" +
                                 "ID: @" + ref_user.name + "\n" +
                                 "Начислить бонусов: 150\n";
-                            ctx.telegram.sendMessage(-4610945060, admin_message, {
+                            ctx.telegram.sendMessage(-1002424442799, admin_message, {
                                 reply_markup: {
                                     inline_keyboard: [
                                         [
@@ -110,7 +110,7 @@ export const registerScene = composeWizardScene(
                                 Message.create({chat_id: ref_user.chat_id, message_id: textMessage.message_id, balance: 150});
                             });
                         }
-                        ctx.telegram.sendMessage(-4610945060, message, {
+                        ctx.telegram.sendMessage(-1002424442799, message, {
                             reply_markup: {
                                 inline_keyboard: [
                                     [
