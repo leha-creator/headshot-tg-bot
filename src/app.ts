@@ -14,6 +14,7 @@ import {connect, model} from 'mongoose';
 import {UserSchema} from "./Models/User.model";
 import {MessageSchema} from "./Models/Message.model";
 import {ListCommand} from "./commands/list.command";
+import {CheckCommand} from "./commands/check.command";
 
 class Bot {
     bot: Telegraf<IBotContext>;
@@ -40,6 +41,7 @@ class Bot {
             new StartCommnds(this.bot, adminService),
             new RegisterCommand(this.bot),
             new ListCommand(this.bot, adminService),
+            new CheckCommand(this.bot, adminService),
         ];
 
         this.bot.action('bonuses_accrued', async (ctx: any, next: any) => {
