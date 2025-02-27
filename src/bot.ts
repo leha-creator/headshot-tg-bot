@@ -13,6 +13,9 @@ import {model} from "mongoose";
 import {MessageSchema} from "./Models/Message.model";
 import {UserSchema} from "./Models/User.model";
 import {AdminService} from "./helpers/admin.service";
+import {helpScene} from "./scenes/help.scene";
+import {HelpCommand} from "./commands/help.command";
+import {MessageCommands} from "./commands/message.command";
 
 export class Bot {
     bot: Telegraf<IBotContext>;
@@ -28,11 +31,16 @@ export class Bot {
 
     async init() {
         const register = registerScene('register', () => {
-            console.log('ok')
+            console.log('register');
+        });
+
+        const help = helpScene('help', () => {
+            console.log('help');
         });
 
         const stage = new Stage([
             register,
+            help
         ]);
 
         this.bot.use(stage.middleware());
@@ -41,6 +49,8 @@ export class Bot {
             new RegisterCommand(this.bot),
             new ListCommand(this.bot, this.adminService),
             new CheckCommand(this.bot, this.adminService, this.configService),
+            new HelpCommand(this.bot),
+            new MessageCommands(this.bot)
         ];
 
         this.bot.action('bonuses_accrued', async (ctx: any) => {
