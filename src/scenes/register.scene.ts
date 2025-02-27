@@ -4,7 +4,9 @@ import {model} from 'mongoose';
 import crypto from 'crypto'
 import {escapeText} from "../helpers/domain.service";
 import {logger} from "../helpers/logger";
-import {MessageSchema} from "../Models/Message.model";
+import {AdminService} from "../helpers/admin.service";
+import {ConfigService} from "../config/configService";
+const configService = ConfigService.getInstance();
 
 export const registerScene = composeWizardScene(
     async (ctx) => {
@@ -26,13 +28,14 @@ export const registerScene = composeWizardScene(
             name: ctx.message.from.username,
             ref_code: ref_code,
             city: undefined,
-            join_code: join_code
+            join_code: join_code,
+            is_bonus_accrued: false,
         });
 
         try {
             let message = 'Хэй, геймер\\! 👋 Я бот [HEADSHOT]((https://t.me/headshot_cyber)\\. Регайся, и бонус твой\\! 💰 Кнопка внизу 👇';
             if (ref_user_name) {
-                message = 'Привет\\! Ваш друг ' + escapeText('@' + ref_user_name) + ' пригласил вас в [HEADSHOT]((https://t.me/headshot_cyber), и это круто\\! 🎉 Зарегистрируйтесь, чтобы получить приветственный бонус \\+ еще 100 бонусных рублей на свой счет\\! 👇';
+                message = 'Привет\\! Ваш друг ' + escapeText('@' + ref_user_name) + ' пригласил вас в [HEADSHOT]((https://t.me/headshot_cyber), и это круто\\! 🎉 Зарегистрируйтесь, чтобы получить приветственный бонус \\+ еще 150 бонусных рублей на свой счет\\! 👇';
             }
             ctx.reply(message, {
                 reply_markup: {
@@ -100,72 +103,19 @@ export const registerScene = composeWizardScene(
                     name: ctx.update.callback_query.from.username,
                     city: ctx.update.callback_query.data,
                     ref_code,
+                    is_bonus_accrued: false,
                 });
 
                 const chat_id = ctx.update.callback_query.from.id;
                 const User = model("User", UserSchema);
                 const user = await User.findOne({chat_id: chat_id});
                 if (user) {
-                    const chat_member = await ctx.telegram.getChatMember(-1001634058732, chat_id);
+                    const chat_member = await ctx.telegram.getChatMember(configService.get('HEADSHOT_CHANNEL_ID'), chat_id);
                     if (chat_member.status == 'member') {
                         const User = model("User", UserSchema);
                         const ref_user = await User.findOne({ref_code: user.join_code});
-                        ctx.reply(`Поздравляем! Вы успешно подписались! 300 рублей скоро зачислятся на ваш бонусный счет. Пригласите друга по этой ссылке и получите оба на каждого по 150 бонусных рублей! Реферальная ссылка: https://t.me/headshot_club_bot?start=` + user.ref_code);
-                        if (ref_user && ref_user.ref_code !== undefined) {
-                            ctx.telegram.sendMessage(ref_user.chat_id, 'Ура! 🎉 Ваш друг @' + user.name + ' зарегистрировался! 150 рублей скоро зачислятся на ваш бонусный счёт! 💰');
-                        }
-
-                        let message = "❗️Новый пользователь:\n" +
-                            "\n" +
-                            "Номер: " + user.phone + "\n" +
-                            "ID: @" + user.name + "\n" +
-                            "Город: " + (user.city ?? 'Не указан') + "\n" +
-                            "Начислить бонусов: 300\n";
-                        let balance = 300;
-                        if (ref_user && ref_user.ref_code !== undefined) {
-                            message = "❗️Новый пользователь по приглашению:\n" +
-                                "\n" +
-                                "Номер: " + user.phone + "\n" +
-                                "ID: @" + user.name + "\n" +
-                                "Город: " + (user.city ?? 'Не указан') + "\n" +
-                                "Начислить бонусов: 450\n";
-                            balance = 450;
-                            const admin_message = "❗ Пригласивший пользователь:\n" +
-                                "Номер: " + ref_user.phone + "\n" +
-                                "ID: @" + ref_user.name + "\n" +
-                                "Город: " + (ref_user.city ?? 'Не указан') + "\n" +
-                                "Начислить бонусов: 150\n";
-                            ctx.telegram.sendMessage(-1002424442799, admin_message, {
-                                reply_markup: {
-                                    inline_keyboard: [
-                                        [
-                                            {
-                                                text: "✅ Начислено",
-                                                callback_data: 'bonuses_accrued',
-                                            },
-                                        ],
-                                    ],
-                                },
-                            }).then((textMessage: any) => {
-                                const Message = model("Message", MessageSchema);
-                                Message.create({chat_id: ref_user.chat_id, message_id: textMessage.message_id, balance: 150});
-                            });
-                        }
-                        ctx.telegram.sendMessage(-1002424442799, message, {
-                            reply_markup: {
-                                inline_keyboard: [
-                                    [
-                                        {
-                                            text: "✅ Начислено",
-                                            callback_data: 'bonuses_accrued',
-                                        },
-                                    ],
-                                ],
-                            },
-                        }).then((textMessage: any) => {
-                            const Message = model("Message", MessageSchema);
-                            Message.create({chat_id: chat_id, message_id: textMessage.message_id, balance: balance});
-                        });
+                        ctx.reply('Отлично! После проверки модератором мы вышлем вам сообщение о начислении бонуса.');
+                        AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
                         return done();
                     }
                 }
@@ -176,7 +126,7 @@ export const registerScene = composeWizardScene(
                     keyboard: [
                         [
                             {
-                                text: "Сначала",
+                                text: "Попробовать ещё раз",
                                 request_contact: true,
                             },
                         ],

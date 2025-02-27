@@ -26,7 +26,6 @@ export class ConfigService implements IConfigServise {
         return this.instance;
     }
 
-
     get(key: string): string {
         const res = this.config[key];
         if (!res) {

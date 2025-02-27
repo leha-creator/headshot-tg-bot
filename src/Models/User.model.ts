@@ -9,6 +9,7 @@ export interface IUser
     phone?: number|undefined,
     join_code?: string|undefined
     ref_code: string,
+    is_bonus_accrued: boolean|undefined,
 }
 
 export const UserSchema = new Schema<IUser>
@@ -20,4 +21,5 @@ export const UserSchema = new Schema<IUser>
     phone: { type: Number, required: false },
     join_code: { type: String, required: false },
     ref_code: { type: String, required: true },
+    is_bonus_accrued: { type: Boolean, required: false, default: false },
 });

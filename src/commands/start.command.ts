@@ -5,7 +5,7 @@ import {AdminService} from "../helpers/admin.service";
 import {model} from "mongoose";
 import {UserSchema} from "../Models/User.model";
 
-export class StartCommnds extends Command {
+export class StartCommand extends Command {
     constructor(bot: Telegraf<IBotContext>, public adminService: AdminService) {
         super(bot);
     }
