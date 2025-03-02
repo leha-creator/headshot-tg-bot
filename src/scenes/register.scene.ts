@@ -30,6 +30,7 @@ export const registerScene = composeWizardScene(
             city: undefined,
             join_code: join_code,
             is_bonus_accrued: false,
+            is_subscribed: false
         });
 
         try {
