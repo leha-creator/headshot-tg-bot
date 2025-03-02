@@ -16,6 +16,8 @@ import {AdminService} from "./helpers/admin.service";
 import {helpScene} from "./scenes/help.scene";
 import {HelpCommand} from "./commands/help.command";
 import {MessageCommands} from "./commands/message.command";
+import {DistributeCommand} from "./commands/distribute.command";
+import {MenuCommand} from "./commands/menu.command";
 
 export class Bot {
     bot: Telegraf<IBotContext>;
@@ -50,9 +52,44 @@ export class Bot {
             new ListCommand(this.bot, this.adminService),
             new CheckCommand(this.bot, this.adminService, this.configService),
             new HelpCommand(this.bot),
+            new DistributeCommand(this.bot, this.adminService),
+            new MenuCommand(this.bot),
             new MessageCommands(this.bot)
         ];
-
+        this.bot.action('book', async (ctx: any) => {
+            ctx.reply('Выберите клуб', {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: "Ливанова",
+                                url: 'https://langame.ru/799451106_computerniy_club_headshot-na-livanova_ulyanovsk',
+                            },
+                            {
+                                text: "Гончарова",
+                                url: 'https://langame.ru/797058697_computerniy_club_headshot-na-goncarova_ulyanovsk',
+                            },
+                        ],
+                        [
+                            {
+                                text: "Рябикова",
+                                url: 'https://langame.ru/797072563_computerniy_club_headshot-na-ryabikova_ulyanovsk',
+                            },
+                            {
+                                text: "40 летия победы",
+                                url: 'https://langame.ru/799447780_computerniy_club_headshot-na-40-letiya-pobedy_ulyanovsk',
+                            },
+                        ],
+                        [
+                            {
+                                text: "Димитровград Ленина",
+                                url: 'https://langame.ru/799448233_computerniy_club_headshot-na-lenina_dimitrovgrad',
+                            },
+                        ],
+                    ],
+                },
+            })
+        })
         this.bot.action('bonuses_accrued', async (ctx: any) => {
             const Message = model("Message", MessageSchema);
             const message = await Message.findOne({message_id: ctx.update.callback_query.message.message_id});
@@ -84,6 +121,14 @@ export class Bot {
 
                 await AdminService.setMessageProcessed(message.message_id);
             }
+        });
+
+        this.bot.action('help', (ctx) => {
+            ctx.scene.enter('help');
+        });
+
+        this.bot.action('end_help', (ctx) => {
+            ctx.reply('Обращение успешно закрыто');
         });
 
         this.bot.action('user_not_registered', async (ctx: any) => {
