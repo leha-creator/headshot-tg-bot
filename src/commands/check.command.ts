@@ -22,7 +22,19 @@ export class CheckCommand extends Command {
             const User = model("User", UserSchema);
             const Message = model("Message", MessageSchema);
 
-            const users = await User.find();
+            const users = await User.find({
+                $or: [
+                    {
+                        is_subscribed: false
+                    },
+                    {
+                        is_subscribed: {
+                            $exists: false
+                        }
+                    }
+                ]
+            });
+            console.log('Пользователей для обработки: ' + users.length);
             let number_subscribed_users = 0;
             for (const user of users) {
                 console.log('Обрабатываем пользователя phone:' + user.phone);
