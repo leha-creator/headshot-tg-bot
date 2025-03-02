@@ -23,6 +23,7 @@ export class CheckCommand extends Command {
             const Message = model("Message", MessageSchema);
 
             const users = await User.find();
+            let  number_subscribed_users = 0;
             users.forEach((user) => {
                 const promise = new Promise((resolve) => {
                     Message.findOne({chat_id: user.chat_id}).then(result => resolve(result))
@@ -33,14 +34,13 @@ export class CheckCommand extends Command {
                         if (!result) {
                             const chat_member = await this.bot.telegram.getChatMember(this.configService.get('HEADSHOT_CHANNEL_ID'), user.chat_id);
                             if (chat_member.status == 'member') {
-                                const User = model("User", UserSchema);
-                                const ref_user = await User.findOne({ref_code: user.join_code});
-
-                                AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
+                                number_subscribed_users += 1;
                             }
                         }
                     })
-            })
+            });
+
+            await ctx.reply('Количество подписанных пользователей: ' + number_subscribed_users);
         });
     }
 }
