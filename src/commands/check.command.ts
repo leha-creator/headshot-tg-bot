@@ -24,13 +24,12 @@ export class CheckCommand extends Command {
 
             const users = await User.find();
             let number_subscribed_users = 0;
-            for (const user of users) {
+            for (let user of users) {
                 console.log('Обрабатываем пользователя phone:' + user.phone);
                 const message = await Message.findOne({chat_id: user.chat_id});
 
                 if (message !== undefined) {
                     const chat_member = await this.bot.telegram.getChatMember(this.configService.get('HEADSHOT_CHANNEL_ID'), user.chat_id);
-                    delete(user._id);
                     if (chat_member !== undefined && chat_member.status == 'member') {
                         user.is_subscribed = true;
                         await updateOrInsert(user);
