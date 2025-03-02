@@ -24,4 +24,6 @@ export const UserSchema = new Schema<IUser>
     ref_code: { type: String, required: true },
     is_bonus_accrued: { type: Boolean, required: false, default: false },
     is_subscribed: { type: Boolean, required: false, default: false },
+}, {
+    timestamps: true,
 });
