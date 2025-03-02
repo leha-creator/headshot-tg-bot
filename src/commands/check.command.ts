@@ -24,19 +24,21 @@ export class CheckCommand extends Command {
 
             const users = await User.find();
             let number_subscribed_users = 0;
-            for (let user of users) {
+            for (const user of users) {
                 console.log('Обрабатываем пользователя phone:' + user.phone);
                 const message = await Message.findOne({chat_id: user.chat_id});
 
                 if (message !== undefined) {
-                    const chat_member = await this.bot.telegram.getChatMember(this.configService.get('HEADSHOT_CHANNEL_ID'), user.chat_id);
-                    if (chat_member !== undefined && chat_member.status == 'member') {
-                        user.is_subscribed = true;
-                        await updateOrInsert(user);
-                        number_subscribed_users += 1;
-                    } else {
-                        user.is_subscribed = false;
-                        await updateOrInsert(user);
+                    try {
+                        const chat_member = await this.bot.telegram.getChatMember(this.configService.get('HEADSHOT_CHANNEL_ID'), user.chat_id);
+                        if (chat_member !== undefined && chat_member.status == 'member') {
+                            await updateSubscribed(user.chat_id, true);
+                            number_subscribed_users += 1;
+                        } else {
+                            await updateSubscribed(user.chat_id, false);
+                        }
+                    } catch (e) {
+                       console.log(e)
                     }
                 }
 
@@ -48,13 +50,12 @@ export class CheckCommand extends Command {
     }
 }
 
-async function updateOrInsert(user_data: IUser) {
+async function updateSubscribed(chat_id: number, is_subscribed: boolean) {
     const User = model("User", UserSchema);
-    const user = await User.findOne({chat_id: user_data.chat_id});
+    const user = await User.findOne({chat_id: chat_id});
     if (user) {
-        await user.updateOne(user_data);
-    } else {
-        await User.create(user_data);
+        user.is_subscribed = is_subscribed;
+        await user.updateOne(user);
     }
 }
 
