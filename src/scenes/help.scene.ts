@@ -7,7 +7,26 @@ const configService = ConfigService.getInstance();
 
 export const helpScene = composeWizardScene(
     async (ctx) => {
-        ctx.reply('Опишите вашу проблему в этом сообщении. Оно будет передано модератору, и вы получите ответ в ближайшее время.');
+        ctx.wizard.state.address = null;
+        ctx.reply('Выберите клуб, по которому хотели бы создать обращение', {
+            reply_markup: {
+                keyboard: [
+                    [{text: "Ливанова"}, {text: "Гончарова"}],
+                    [{text: "Рябикова"}, {text: "40 летия победы"}],
+                    [{text: "Димитровград Ленина"}],
+                ]
+            },
+        });
+        return ctx.wizard.next();
+    },
+    async (ctx) => {
+        if (ctx.message.text !== undefined) {
+            ctx.wizard.state.address = ctx.message.text;
+        } else {
+            return ctx.wizard.steps[0](ctx);
+        }
+
+        ctx.reply('Теперь опишите вашу проблему. Администратор ответит в ближайшее время');
         return ctx.wizard.next();
     },
     async (ctx: any, done: any) => {
@@ -18,6 +37,7 @@ export const helpScene = composeWizardScene(
                     chat_id: ctx.message.chat.id,
                     original_message_id: ctx.message.message_id,
                     message_id: textMessage.message_id,
+                    address: ctx.wizard.state.address
                 });
             });
         }

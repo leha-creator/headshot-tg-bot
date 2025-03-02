@@ -18,4 +18,4 @@ export const MessageSchema = new Schema<IMessage>
     balance: { type: Number, required: false },
     is_processed: { type: Boolean, required: false, default: false },
     is_referral_message: { type: Boolean, required: false, default: false },
-});
+}, { timestamps: true });

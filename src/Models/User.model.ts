@@ -22,4 +22,4 @@ export const UserSchema = new Schema<IUser>
     join_code: { type: String, required: false },
     ref_code: { type: String, required: true },
     is_bonus_accrued: { type: Boolean, required: false, default: false },
-});
+}, { timestamps: true });

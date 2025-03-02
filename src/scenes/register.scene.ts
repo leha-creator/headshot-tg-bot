@@ -11,14 +11,12 @@ const configService = ConfigService.getInstance();
 export const registerScene = composeWizardScene(
     async (ctx) => {
         ctx.wizard.state.phone = null;
-        let join_code = '';
         let ref_user_name = '';
         const ref_user_code = ctx.session.ref_code;
         if (ref_user_code !== undefined) {
             const User = model("User", UserSchema);
             const ref_user = await User.findOne({ref_code: ref_user_code});
             if (ref_user && ref_user.ref_code !== undefined) {
-                join_code = ref_user.ref_code;
                 ref_user_name = ref_user.name;
             }
         }
@@ -28,7 +26,7 @@ export const registerScene = composeWizardScene(
             name: ctx.message.from.username,
             ref_code: ref_code,
             city: undefined,
-            join_code: join_code,
+            join_code: ref_user_code,
             is_bonus_accrued: false,
         });
 

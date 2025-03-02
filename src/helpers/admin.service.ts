@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import {logger} from './logger';
 import {model} from "mongoose";
 import {MessageSchema} from "../Models/Message.model";
-import {IUser, UserSchema} from "../Models/User.model";
+import {IUser} from "../Models/User.model";
 import {ConfigService} from "../config/configService";
 
 const configService = ConfigService.getInstance();
