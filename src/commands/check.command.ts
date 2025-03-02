@@ -29,9 +29,13 @@ export class CheckCommand extends Command {
 
                 if (message !== undefined) {
                     const chat_member = await this.bot.telegram.getChatMember(this.configService.get('HEADSHOT_CHANNEL_ID'), user.chat_id);
-                    if (chat_member.status == 'member') {
+                    if (chat_member !== undefined && chat_member.status == 'member') {
+                        user.is_subscribed = true;
                         await updateOrInsert(user);
                         number_subscribed_users += 1;
+                    } else {
+                        user.is_subscribed = false;
+                        await updateOrInsert(user);
                     }
                 }
 
