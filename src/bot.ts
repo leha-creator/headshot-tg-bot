@@ -152,6 +152,8 @@ export class Bot {
                 } else if (chat_member.status == 'member') {
                     const User = model("User", UserSchema);
                     const ref_user = await User.findOne({ref_code: user.join_code});
+                    user.is_subscribed = true;
+                    await user.updateOne(user);
                     ctx.reply('Отлично! После проверки модератором мы вышлем вам сообщение о начислении бонуса.');
                     AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
                     next();

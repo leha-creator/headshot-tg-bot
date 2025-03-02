@@ -28,6 +28,7 @@ export const registerScene = composeWizardScene(
             city: undefined,
             join_code: ref_user_code,
             is_bonus_accrued: false,
+            is_subscribed: false
         });
 
         try {
@@ -102,6 +103,7 @@ export const registerScene = composeWizardScene(
                     city: ctx.update.callback_query.data,
                     ref_code,
                     is_bonus_accrued: false,
+                    is_subscribed: false,
                 });
 
                 const chat_id = ctx.update.callback_query.from.id;
@@ -110,8 +112,9 @@ export const registerScene = composeWizardScene(
                 if (user) {
                     const chat_member = await ctx.telegram.getChatMember(configService.get('HEADSHOT_CHANNEL_ID'), chat_id);
                     if (chat_member.status == 'member') {
-                        const User = model("User", UserSchema);
                         const ref_user = await User.findOne({ref_code: user.join_code});
+                        user.is_subscribed = true;
+                        await updateOrInsert(user);
                         ctx.reply('Отлично! После проверки модератором мы вышлем вам сообщение о начислении бонуса.');
                         AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
                         return done();
