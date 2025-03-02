@@ -40,7 +40,7 @@ export class CheckCommand extends Command {
                         }
                     });
 
-                await sleep(1000);
+                await sleep(500);
             }
 
             await ctx.reply('Количество подписанных пользователей: ' + number_subscribed_users);
