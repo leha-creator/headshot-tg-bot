@@ -90,6 +90,12 @@ export class Bot {
                 },
             })
         })
+
+        help.action(/^select-club-(\d+)$/, (ctx) => {
+            ctx.wizard.state.address = ctx.match[1];
+            return ctx.wizard.steps[ctx.wizard.cursor](ctx);
+        })
+
         this.bot.action('bonuses_accrued', async (ctx: any) => {
             const Message = model("Message", MessageSchema);
             const message = await Message.findOne({message_id: ctx.update.callback_query.message.message_id});
