@@ -15,7 +15,7 @@ export class MenuCommand extends Command {
                         [
                             {
                                 text: "Прайс",
-                                url: 'https://headshot24.ru/price',
+                                callback_data: 'price',
                             },
                             {
                                 text: "Забронировать",

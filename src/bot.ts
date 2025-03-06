@@ -18,6 +18,7 @@ import {HelpCommand} from "./commands/help.command";
 import {MessageCommands} from "./commands/message.command";
 import {DistributeCommand} from "./commands/distribute.command";
 import {MenuCommand} from "./commands/menu.command";
+import {CLUBS, priceScene} from "./scenes/price.scene";
 
 export class Bot {
     bot: Telegraf<IBotContext>;
@@ -40,9 +41,14 @@ export class Bot {
             console.log('help');
         });
 
+        const price = priceScene('price', () => {
+            console.log('price');
+        });
+
         const stage = new Stage([
             register,
-            help
+            help,
+            price
         ]);
 
         this.bot.use(stage.middleware());
@@ -56,6 +62,7 @@ export class Bot {
             new MenuCommand(this.bot),
             new MessageCommands(this.bot)
         ];
+
         this.bot.action('book', async (ctx: any) => {
             ctx.reply('Выберите клуб', {
                 reply_markup: {
@@ -94,7 +101,20 @@ export class Bot {
         help.action(/^select-club-(\d+)$/, (ctx) => {
             ctx.wizard.state.address = ctx.match[1];
             return ctx.wizard.steps[ctx.wizard.cursor](ctx);
-        })
+        });
+
+        this.bot.action(/^price-select-club-(\d+)$/, async (ctx) => {
+            if (CLUBS[ctx.match[1]] !== undefined) {
+                await ctx.replyWithPhoto(CLUBS[ctx.match[1]].price_url);
+            }
+        });
+
+        price.action(/^price-select-club-(\d+)$/, async (ctx) => {
+            if (CLUBS[ctx.match[1]] !== undefined) {
+                await ctx.replyWithPhoto(CLUBS[ctx.match[1]].price_url);
+            }
+            return ctx.scene.leave();
+        });
 
         this.bot.action('bonuses_accrued', async (ctx: any) => {
             const Message = model("Message", MessageSchema);
@@ -127,6 +147,10 @@ export class Bot {
 
                 await AdminService.setMessageProcessed(message.message_id);
             }
+        });
+
+        this.bot.action('price', async (ctx: any) => {
+            return ctx.scene.enter('price');
         });
 
         this.bot.action('help', (ctx) => {

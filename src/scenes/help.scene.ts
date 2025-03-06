@@ -41,8 +41,6 @@ export const helpScene = composeWizardScene(
         return ctx.wizard.next();
     },
     async (ctx) => {
-        console.log(ctx.wizard.state.address);
-        console.log(CLUBS[ctx.wizard.state.address]);
         if ((!ctx.wizard.state.address || CLUBS[ctx.wizard.state.address] == undefined) && (ctx.message == undefined || ctx.message.text == undefined)) {
             ctx.wizard.cursor = 0;
             return ctx.wizard.steps[0](ctx);
