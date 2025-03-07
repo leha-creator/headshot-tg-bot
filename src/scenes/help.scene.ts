@@ -15,7 +15,6 @@ const CLUBS = {
     5: "Димитровград Ленина"
 }
 
-
 export const helpScene = composeWizardScene(
     async (ctx) => {
         ctx.wizard.state.address = ctx.session.addres ?? null;

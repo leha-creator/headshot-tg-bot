@@ -14,12 +14,28 @@ export class MenuCommand extends Command {
                     inline_keyboard: [
                         [
                             {
+                                text: "Акции",
+                                callback_data: 'current-actions',
+                            },
+                            {
+                                text: "Контакты",
+                                callback_data: 'contacts',
+                            },
+                        ],
+                        [
+                            {
                                 text: "Прайс",
                                 callback_data: 'price',
                             },
                             {
                                 text: "Забронировать",
                                 callback_data: 'book',
+                            },
+                        ],
+                        [
+                            {
+                                text: "Поддержка",
+                                callback_data: 'help',
                             },
                         ],
                     ],
