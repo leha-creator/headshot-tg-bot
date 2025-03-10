@@ -29,22 +29,17 @@ export class CheckCommand extends Command {
             for (const user of users) {
                 console.log('Обрабатываем пользователя phone:' + user.phone);
                 try {
-                    const promise = new Promise((resolve) => {
-                        Message.findOne({chat_id: user.chat_id}).then(result => resolve(result))
-                    });
+                    const message = await Message.findOne({chat_id: user.chat_id});
 
-                    promise.then(
-                        async result => {
-                            if (!result) {
-                                const chat_member = await this.bot.telegram.getChatMember(this.configService.get('HEADSHOT_CHANNEL_ID'), user.chat_id);
-                                if (chat_member.status == 'member') {
-                                    const User = model("User", UserSchema);
-                                    const ref_user = await User.findOne({ref_code: user.join_code});
-                                    number_subscribed_users += 1;
-                                    AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
-                                }
-                            }
-                        })
+                    if (!message) {
+                        const chat_member = await this.bot.telegram.getChatMember(this.configService.get('HEADSHOT_CHANNEL_ID'), user.chat_id);
+                        if (chat_member.status == 'member') {
+                            const User = model("User", UserSchema);
+                            const ref_user = await User.findOne({ref_code: user.join_code});
+                            number_subscribed_users += 1;
+                            AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
+                        }
+                    }
                 } catch (e) {
                     console.log(e)
                 }
