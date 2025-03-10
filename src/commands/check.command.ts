@@ -38,10 +38,10 @@ export class CheckCommand extends Command {
             let number_subscribed_users = 0;
             for (const user of users) {
                 console.log('Обрабатываем пользователя phone:' + user.phone);
-                const message = await Message.findOne({chat_id: user.chat_id});
+                try {
+                    const message = await Message.findOne({chat_id: user.chat_id});
 
-                if (message !== undefined) {
-                    try {
+                    if (message !== undefined) {
                         const chat_member = await this.bot.telegram.getChatMember(this.configService.get('HEADSHOT_CHANNEL_ID'), user.chat_id);
                         if (chat_member !== undefined && chat_member.status == 'member') {
                             await updateSubscribed(user.chat_id, true);
@@ -49,12 +49,11 @@ export class CheckCommand extends Command {
                         } else {
                             await updateSubscribed(user.chat_id, false);
                         }
-                    } catch (e) {
-                       console.log(e)
-                    }
-                }
 
-                await sleep(500);
+                    }
+                } catch (e) {
+                    console.log(e)
+                }
             }
 
             await ctx.reply('Количество подписанных пользователей: ' + number_subscribed_users);
