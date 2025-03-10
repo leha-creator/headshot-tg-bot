@@ -39,12 +39,11 @@ export class CheckCommand extends Command {
                             number_subscribed_users += 1;
                             AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
                         }
+                        await sleep(1500);
                     }
                 } catch (e) {
                     console.log(e)
                 }
-
-                await sleep(1000);
             }
 
             await ctx.reply('Количество потерявшихся пользователей: ' + number_subscribed_users);
