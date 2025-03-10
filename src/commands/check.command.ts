@@ -38,8 +38,8 @@ export class CheckCommand extends Command {
                             const ref_user = await User.findOne({ref_code: user.join_code});
                             number_subscribed_users += 1;
                             AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
+                            await sleep(2000);
                         }
-                        await sleep(1500);
                     }
                 } catch (e) {
                     console.log(e)
