@@ -48,7 +48,8 @@ export class CheckCommand extends Command {
                 } catch (e) {
                     console.log(e)
                 }
-                await sleep(500);
+
+                await sleep(1000);
             }
 
             await ctx.reply('Количество потерявшихся пользователей: ' + number_subscribed_users);
