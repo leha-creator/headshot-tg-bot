@@ -76,8 +76,8 @@ export class AdminService {
             "Номер: " + user.phone + "\n" +
             "ID: @" + user.name + "\n" +
             "Город: " + (user.city ?? 'Не указан') + "\n" +
-            "Начислить бонусов: 300\n";
-        let balance = 300;
+            "Начислить бонусов: 150\n";
+        let balance = 150;
 
         if (ref_user && ref_user.ref_code !== undefined) {
             message = "❗️Новый пользователь по приглашению:\n" +
@@ -85,13 +85,13 @@ export class AdminService {
                 "Номер: " + user.phone + "\n" +
                 "ID: @" + user.name + "\n" +
                 "Город: " + (user.city ?? 'Не указан') + "\n" +
-                "Начислить бонусов: 450\n";
-            balance = 450;
+                "Начислить бонусов: 250\n";
+            balance = 250;
             const admin_message = "❗ Пригласивший пользователь:\n" +
                 "Номер: " + ref_user.phone + "\n" +
                 "ID: @" + ref_user.name + "\n" +
                 "Город: " + (ref_user.city ?? 'Не указан') + "\n" +
-                "Начислить бонусов: 150\n";
+                "Начислить бонусов: 100\n";
             setTimeout(() => {
                 ctx.telegram.sendMessage(configService.get('HEADSHOT_ADMIN_GROUP_ID'), admin_message, {
                     reply_markup: {
@@ -110,7 +110,7 @@ export class AdminService {
                         chat_id: user.chat_id,
                         referral_chat_id: ref_user.chat_id,
                         message_id: textMessage.message_id,
-                        balance: 150,
+                        balance: 100,
                         is_referral_message: true
                     });
                 });
