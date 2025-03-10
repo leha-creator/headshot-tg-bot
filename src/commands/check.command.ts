@@ -22,7 +22,7 @@ export class CheckCommand extends Command {
             const User = model("User", UserSchema);
             const Message = model("Message", MessageSchema);
 
-            const users = await User.find({});
+            const users = await User.find({phone: {$ne: undefined}});
             await ctx.reply('Пользователей для обработки: ' + users.length);
             console.log('Пользователей для обработки: ' + users.length);
             let number_subscribed_users = 0;
@@ -38,7 +38,7 @@ export class CheckCommand extends Command {
                             const ref_user = await User.findOne({ref_code: user.join_code});
                             number_subscribed_users += 1;
                             AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
-                            await sleep(2000);
+                            await sleep(3500);
                         }
                     }
                 } catch (e) {
