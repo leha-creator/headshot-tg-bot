@@ -20,7 +20,7 @@ export class Bot {
 
     constructor(private readonly configService: IConfigServise, private readonly adminService: AdminService) {
         this.adminService = adminService;
-        this.bot = new Telegraf<IBotContext>(this.configService.get('TOKEN'));
+        this.bot = new Telegraf<IBotContext>(this.configService.get('TOKEN'), {handlerTimeout: 9_000_000});
         this.bot.use(
             new LocalSession({database: 'sessions.json'}).middleware()
         );
