@@ -4,7 +4,7 @@ import {model} from 'mongoose';
 import crypto from 'crypto'
 import {escapeText} from "../helpers/domain.service";
 import {logger} from "../helpers/logger";
-import {AdminService} from "../helpers/admin.service";
+import {AdminService, USER_BONUS_QUANTITY, USER_JOIN_BY_REF_BONUS_QUANTITY} from "../helpers/admin.service";
 import {ConfigService} from "../config/configService";
 const configService = ConfigService.getInstance();
 
@@ -34,7 +34,7 @@ export const registerScene = composeWizardScene(
         try {
             let message = 'Хэй, геймер\\! 👋 Я бот [HEADSHOT]((https://t.me/headshot_cyber)\\. Регайся, и бонус твой\\! 💰 Кнопка внизу 👇';
             if (ref_user_name) {
-                message = 'Привет\\! Ваш друг ' + escapeText('@' + ref_user_name) + ' пригласил вас в [HEADSHOT]((https://t.me/headshot_cyber), и это круто\\! 🎉 Зарегистрируйтесь, чтобы получить приветственный бонус \\+ еще 100 бонусных рублей на свой счет\\! 👇';
+                message = 'Привет\\! Ваш друг ' + escapeText('@' + ref_user_name) + ' пригласил вас в [HEADSHOT]((https://t.me/headshot_cyber), и это круто\\! 🎉 Зарегистрируйтесь, чтобы получить приветственный бонус \\+ еще ' + (USER_JOIN_BY_REF_BONUS_QUANTITY - USER_BONUS_QUANTITY) + ' бонусных рублей на свой счет\\! 👇';
             }
             ctx.reply(message, {
                 reply_markup: {

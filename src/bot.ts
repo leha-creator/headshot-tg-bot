@@ -12,7 +12,7 @@ import {CheckCommand} from "./commands/check.command";
 import {model} from "mongoose";
 import {MessageSchema} from "./Models/Message.model";
 import {UserSchema} from "./Models/User.model";
-import {AdminService} from "./helpers/admin.service";
+import {AdminService, USER_REF_BONUS_QUANTITY} from "./helpers/admin.service";
 
 export class Bot {
     bot: Telegraf<IBotContext>;
@@ -61,13 +61,16 @@ export class Bot {
                     if (user) {
                         const ref_user = await User.findOne({ref_code: user.join_code});
                         if (ref_user && ref_user.ref_code !== undefined) {
-                            ctx.telegram.sendMessage(ref_user.chat_id, 'Ура! 🎉 Ваш друг @' + user.name + ' зарегистрировался! 100 рублей скоро зачислятся на ваш бонусный счёт! 💰');
+                            const ref_message = await Message.findOne({chat_id: user.chat_id, referral_chat_id: ref_user.chat_id});
+                            if (ref_message) {
+                                ctx.telegram.sendMessage(ref_user.chat_id, `Ура! 🎉 Ваш друг @` + user.name + ` зарегистрировался! ${ref_message.balance} рублей скоро зачислятся на ваш бонусный счёт! 💰`);
+                            }
                         }
 
                         user.is_bonus_accrued = true;
                         await user.updateOne(user);
 
-                        ctx.telegram.sendMessage(user.chat_id, `Поздравляем! Вы успешно подписались! ${message.balance} рублей скоро зачислятся на ваш бонусный счет. Пригласите друга по этой ссылке и получите оба на каждого по 100 бонусных рублей! Реферальная ссылка: https://t.me/headshot_club_bot?start=` + user.ref_code);
+                        ctx.telegram.sendMessage(user.chat_id, `Поздравляем! Вы успешно подписались! ${message.balance} рублей скоро зачислятся на ваш бонусный счет. Пригласите друга по этой ссылке и получите оба на каждого по ` + USER_REF_BONUS_QUANTITY + ` бонусных рублей! Реферальная ссылка: https://t.me/headshot_club_bot?start=` + user.ref_code);
                         await this.bot.telegram.editMessageText(ctx.chat.id, ctx.update.callback_query.message.message_id, undefined, 'Пользователю ' + user.phone + ' зачислено ' + message.balance + ' бонусов ✅');
                     }
                 }

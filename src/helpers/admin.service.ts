@@ -2,10 +2,14 @@ import * as fs from 'fs';
 import {logger} from './logger';
 import {model} from "mongoose";
 import {MessageSchema} from "../Models/Message.model";
-import {IUser, UserSchema} from "../Models/User.model";
+import {IUser} from "../Models/User.model";
 import {ConfigService} from "../config/configService";
 
 const configService = ConfigService.getInstance();
+
+export const USER_BONUS_QUANTITY = 150;
+export const USER_REF_BONUS_QUANTITY = 100;
+export const USER_JOIN_BY_REF_BONUS_QUANTITY = 250;
 
 export class AdminService {
     private static instance: AdminService;
@@ -71,27 +75,27 @@ export class AdminService {
     }
 
     static sendMessagesToAdminOnSubscribe(user: IUser, ref_user: IUser | null, ctx) {
+        let balance = USER_BONUS_QUANTITY;
         let message = "❗️Новый пользователь:\n" +
             "\n" +
             "Номер: " + user.phone + "\n" +
             "ID: @" + user.name + "\n" +
             "Город: " + (user.city ?? 'Не указан') + "\n" +
-            "Начислить бонусов: 150\n";
-        let balance = 150;
+            "Начислить бонусов: " + balance + "\n";
 
         if (ref_user && ref_user.ref_code !== undefined) {
+            balance = USER_JOIN_BY_REF_BONUS_QUANTITY;
             message = "❗️Новый пользователь по приглашению:\n" +
                 "\n" +
                 "Номер: " + user.phone + "\n" +
                 "ID: @" + user.name + "\n" +
                 "Город: " + (user.city ?? 'Не указан') + "\n" +
-                "Начислить бонусов: 250\n";
-            balance = 250;
+                "Начислить бонусов: " + balance + "\n";
             const admin_message = "❗ Пригласивший пользователь:\n" +
                 "Номер: " + ref_user.phone + "\n" +
                 "ID: @" + ref_user.name + "\n" +
                 "Город: " + (ref_user.city ?? 'Не указан') + "\n" +
-                "Начислить бонусов: 100\n";
+                "Начислить бонусов: " + USER_REF_BONUS_QUANTITY + "\n";
             setTimeout(() => {
                 ctx.telegram.sendMessage(configService.get('HEADSHOT_ADMIN_GROUP_ID'), admin_message, {
                     reply_markup: {
@@ -110,7 +114,7 @@ export class AdminService {
                         chat_id: user.chat_id,
                         referral_chat_id: ref_user.chat_id,
                         message_id: textMessage.message_id,
-                        balance: 100,
+                        balance: USER_REF_BONUS_QUANTITY,
                         is_referral_message: true
                     });
                 });
