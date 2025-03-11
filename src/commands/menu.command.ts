@@ -9,33 +9,37 @@ export class MenuCommand extends Command {
 
     handle(): void {
         this.bot.command('menu', async (ctx) => {
-            await ctx.reply('Выберите пункт меню', {
+            await ctx.reply('Меню 🎮', {
                 reply_markup: {
                     inline_keyboard: [
                         [
                             {
-                                text: "Акции",
+                                text: "🎉 Акции",
                                 callback_data: 'current-actions',
                             },
                             {
-                                text: "Контакты",
+                                text: "📞 Контакты",
                                 callback_data: 'contacts',
                             },
                         ],
                         [
                             {
-                                text: "Прайс",
+                                text: "💸 Прайс",
                                 callback_data: 'price',
                             },
                             {
-                                text: "Забронировать",
+                                text: "🕹️ Забронировать",
                                 callback_data: 'book',
                             },
                         ],
                         [
                             {
-                                text: "Поддержка",
+                                text: "🛠️ Поддержка",
                                 callback_data: 'help',
+                            },
+                            {
+                                text: "🎁 Рундук",
+                                callback_data: 'chest',
                             },
                         ],
                     ],

@@ -35,7 +35,7 @@ export const priceScene = composeWizardScene(
             }
         }
 
-        ctx.reply('Выберите клуб, по которому хотели бы узнать прайс', {
+        ctx.reply('Выбери клуб, чтобы узнать прайс:', {
             reply_markup: {
                 inline_keyboard: inline_keyboard
             },

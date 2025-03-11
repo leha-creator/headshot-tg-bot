@@ -25,12 +25,13 @@ import {PriceSelectClubAction} from "./actions/price_select_club.action";
 import {UserNotRegisteredAction} from "./actions/user_not_registered.action";
 import {Action} from "./actions/action.class";
 import {schedule} from "node-cron";
-import {UserSchema} from "./Models/User.model";
 import {model} from "mongoose";
-import {OpenedBoxAction} from "./actions/opened_box.action";
+import {OpenedChestAction} from "./actions/opened_chest.action";
 import {ACTIONS, currentActionsScene} from "./scenes/current_actions.scene";
 import {CurrentActionsAction} from "./actions/current_actions.action";
 import {ContactsAction} from "./actions/contacts.action";
+import {ChestAction} from "./actions/chest.action";
+import {DailyBoxSchema} from "./Models/DailyBox.model";
 
 export class Bot {
     bot: Telegraf<IBotContext>;
@@ -50,34 +51,16 @@ export class Bot {
         this.initCommands();
         this.initActions();
 
-        console.log('333');
         schedule('* * * * *', async () => {
             console.log('Рундук');
-            const User = model("User", UserSchema);
-            const users = await User.find({});
-            for (const user of users) {
-                const now = new Date();
-                const box_id = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDay();
-                await this.bot.telegram.sendMessage(user.chat_id, 'Открывайте сундук', {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                {
-                                    text: "1",
-                                    callback_data: 'opened-box-' + 1 + '-' + box_id,
-                                },
-                                {
-                                    text: "2",
-                                    callback_data: 'opened-box-' + 2 + '-' + box_id,
-                                },
-                                {
-                                    text: "3",
-                                    callback_data: 'opened-box-' + 3 + '-' + box_id,
-                                },
-                            ],
-                        ],
-                    },
-                });
+            const DailyBox = model("DailyBox", DailyBoxSchema);
+            const daily_boxes = await DailyBox.find({createdAt: {$gte: new Date().getTime() - 24 * 60 * 60 * 1000, $lt: new Date().getTime() - 60 * 1000}, next_notified: false});
+            for (const daily_box of daily_boxes) {
+                daily_box.next_notified = true;
+                console.log(daily_box);
+                await daily_box.updateOne(daily_box);
+                await this.bot.telegram.sendMessage(daily_box.chat_id, 'Рундук уже доступен, испытай удачу! 🎉');
+
             }
         })
 
@@ -138,7 +121,7 @@ export class Bot {
             new HelpCommand(this.bot),
             new DistributeCommand(this.bot, this.adminService),
             new MenuCommand(this.bot),
-            new MessageCommands(this.bot)
+            new MessageCommands(this.bot),
         ];
 
         for (const command of this.commands) {
@@ -155,7 +138,8 @@ export class Bot {
             new PriceAction(this.bot),
             new PriceSelectClubAction(this.bot),
             new UserNotRegisteredAction(this.bot),
-            new OpenedBoxAction(this.bot),
+            new OpenedChestAction(this.bot),
+            new ChestAction(this.bot),
             new CurrentActionsAction(this.bot),
             new ContactsAction(this.bot),
         ];

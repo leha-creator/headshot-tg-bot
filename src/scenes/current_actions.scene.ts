@@ -2,27 +2,27 @@ import {composeWizardScene} from "../helpers/scene.servise";
 
 export const ACTIONS = {
     1: {
-        name: 'День рождения',
+        name: '🎂 День рождения',
         price_url: 'https://static.tildacdn.com/tild3433-6365-4533-a664-643237333436/__2.jpg',
     },
     2: {
-        name: 'Приведи друга',
+        name: '👫 Приведи друга',
         price_url: 'https://static.tildacdn.com/tild3564-6564-4336-a630-626237383135/_-.jpg',
     },
     3: {
-        name: 'Испытай удачу',
+        name: '🎰 Испытай удачу',
         price_url: 'https://static.tildacdn.com/tild3430-3963-4138-b761-366536623861/_2.jpg',
     },
     4: {
-        name: 'Новым клиентам',
+        name: '🆕 Новым клиентам',
         price_url: 'https://static.tildacdn.com/tild3736-3335-4536-b930-333961356338/_.jpg',
     },
     5: {
-        name: 'Бонусы за такси',
+        name: '🚕 Бонусы за Такси',
         price_url: 'https://static.tildacdn.com/tild6432-3965-4631-b561-343235343030/photo_2024-12-14_113.jpeg',
     },
     6: {
-        name: 'Бонусы за отзыв',
+        name: '📝 Бонусы за отзыв',
         price_url: 'https://static.tildacdn.com/tild6435-6662-4161-a138-356464343962/IMG_6615.jpeg',
     }
 }
@@ -40,7 +40,7 @@ export const currentActionsScene = composeWizardScene(
             }
         }
 
-        ctx.reply('Выберите акцию, по которому хотели бы узнать подробнее', {
+        ctx.reply('Выбери акцию, чтобы узнать подробности:', {
             reply_markup: {
                 inline_keyboard: inline_keyboard
             },
