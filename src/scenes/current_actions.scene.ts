@@ -46,7 +46,7 @@ export const currentActionsScene = composeWizardScene(
             },
         });
 
-        return ctx.wizard.next();
+        return ctx.scene.leave();
     },
 
     async (ctx: any, done: any) => {

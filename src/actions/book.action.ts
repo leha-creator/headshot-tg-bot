@@ -9,7 +9,8 @@ export class BookAction extends Action {
 
     handle(): void {
         this.bot.action('book', async (ctx: any) => {
-            ctx.reply('Выберите клуб', {
+            ctx.reply('🖥️ Выбери клуб, чтобы забронировать комп или приставку через Langame.\n' +
+                '🎮 Или зарегистрируйся, чтобы получить бонусы!', {
                 reply_markup: {
                     inline_keyboard: [
                         [
@@ -36,6 +37,12 @@ export class BookAction extends Action {
                             {
                                 text: "Димитровград Ленина",
                                 url: 'https://langame.ru/799448233_computerniy_club_headshot-na-lenina_dimitrovgrad',
+                            },
+                        ],
+                        [
+                            {
+                                text: "📝 Зарегистрироваться",
+                                callback_data: 'register',
                             },
                         ],
                     ],

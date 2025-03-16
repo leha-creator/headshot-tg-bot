@@ -41,7 +41,7 @@ export const priceScene = composeWizardScene(
             },
         });
 
-        return ctx.wizard.next();
+        return ctx.scene.leave();
     },
 
     async (ctx: any, done: any) => {

@@ -8,7 +8,7 @@ export class RegisterCommand extends Command {
     }
 
     handle(): void {
-        this.bot.command('test', (ctx) => {
+        this.bot.command('register', (ctx) => {
             ctx.scene.enter('register');
         });
     }

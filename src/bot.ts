@@ -32,6 +32,10 @@ import {CurrentActionsAction} from "./actions/current_actions.action";
 import {ContactsAction} from "./actions/contacts.action";
 import {ChestAction} from "./actions/chest.action";
 import {DailyBoxSchema} from "./Models/DailyBox.model";
+import {ContactSelectClubAction} from "./actions/contacts_select_club.action";
+import {CLUB_CONTACTS, contactsScene} from "./scenes/contacts.scene";
+import {RegisterAction} from "./actions/register.action";
+import {ChestBonusAccruedAction} from "./actions/chest_bonus_accured.action";
 
 export class Bot {
     bot: Telegraf<IBotContext>;
@@ -57,7 +61,6 @@ export class Bot {
             const daily_boxes = await DailyBox.find({createdAt: {$gte: new Date().getTime() - 24 * 60 * 60 * 1000, $lt: new Date().getTime() - 60 * 1000}, next_notified: false});
             for (const daily_box of daily_boxes) {
                 daily_box.next_notified = true;
-                console.log(daily_box);
                 await daily_box.updateOne(daily_box);
                 await this.bot.telegram.sendMessage(daily_box.chat_id, 'Рундук уже доступен, испытай удачу! 🎉');
 
@@ -84,11 +87,16 @@ export class Bot {
             console.log('current-actions');
         });
 
+        const contacts = contactsScene('contacts', () => {
+            console.log('contacts');
+        });
+
         const stage = new Stage([
             register,
             help,
             price,
-            currentActions
+            currentActions,
+            contacts
         ]);
 
         this.bot.use(stage.middleware());
@@ -110,6 +118,12 @@ export class Bot {
                 await ctx.replyWithPhoto(ACTIONS[ctx.match[1]].price_url);
             }
         });
+
+        contacts.action(/^contacts-select-club-(\d+)$/, async (ctx) => {
+            if (ACTIONS[ctx.match[1]] !== undefined) {
+                await ctx.reply(CLUB_CONTACTS[ctx.match[1]].text);
+            }
+        });
     }
 
     initCommands() {
@@ -121,6 +135,7 @@ export class Bot {
             new HelpCommand(this.bot),
             new DistributeCommand(this.bot, this.adminService),
             new MenuCommand(this.bot),
+            new ContactSelectClubAction(this.bot),
             new MessageCommands(this.bot),
         ];
 
@@ -142,6 +157,9 @@ export class Bot {
             new ChestAction(this.bot),
             new CurrentActionsAction(this.bot),
             new ContactsAction(this.bot),
+            new ContactSelectClubAction(this.bot),
+            new RegisterAction(this.bot),
+            new ChestBonusAccruedAction(this.bot),
         ];
 
         for (const action of this.actions) {
