@@ -22,8 +22,18 @@ export class CheckCommand extends Command {
             const User = model("User", UserSchema);
             const Message = model("Message", MessageSchema);
 
-            const users = await User.find({phone: {$ne: undefined}});
-            await ctx.reply('Пользователей для обработки: ' + users.length);
+            const users = await User.find({
+                $or: [
+                    {
+                        is_subscribed: false
+                    },
+                    {
+                        is_subscribed: {
+                            $exists: false
+                        }
+                    }
+                ]
+            });
             console.log('Пользователей для обработки: ' + users.length);
             let number_subscribed_users = 0;
             for (const user of users) {
@@ -31,22 +41,22 @@ export class CheckCommand extends Command {
                 try {
                     const message = await Message.findOne({chat_id: user.chat_id});
 
-                    if (!message) {
+                    if (message !== undefined) {
                         const chat_member = await this.bot.telegram.getChatMember(this.configService.get('HEADSHOT_CHANNEL_ID'), user.chat_id);
-                        if (chat_member.status == 'member') {
-                            const User = model("User", UserSchema);
-                            const ref_user = await User.findOne({ref_code: user.join_code});
+                        if (chat_member !== undefined && chat_member.status == 'member') {
+                            await updateSubscribed(user.chat_id, true);
                             number_subscribed_users += 1;
-                            AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
-                            await sleep(3500);
+                        } else {
+                            await updateSubscribed(user.chat_id, false);
                         }
+
                     }
                 } catch (e) {
                     console.log(e)
                 }
             }
 
-            await ctx.reply('Количество потерявшихся пользователей: ' + number_subscribed_users);
+            await ctx.reply('Количество подписанных пользователей: ' + number_subscribed_users);
         });
     }
 }

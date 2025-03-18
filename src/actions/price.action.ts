@@ -1,15 +1,16 @@
 import {Telegraf} from "telegraf";
-import {Command} from "./command.class";
 import {IBotContext} from "../context/context.interface";
+import {Action} from "./action.class";
 
-export class RegisterCommand extends Command {
+export class PriceAction extends Action {
     constructor(bot: Telegraf<IBotContext>) {
         super(bot);
     }
 
     handle(): void {
-        this.bot.command('register', (ctx) => {
-            ctx.scene.enter('register');
+        this.bot.action('price', async (ctx: any) => {
+            return ctx.scene.enter('price');
         });
     }
 }
+

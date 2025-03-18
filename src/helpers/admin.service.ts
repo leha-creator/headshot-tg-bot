@@ -142,6 +142,28 @@ export class AdminService {
         })
     }
 
+    static sendMessagesToAdminOnChestWin(user: IUser, code: number, ctx, box_id: string, ) {
+        const message = "❗Выигрыш в \"Рундуке\":\n" +
+            "\n" +
+            "Номер: " + user.phone + "\n" +
+            "ID: @" + user.name + "\n" +
+            "Город: " + (user.city ?? 'Не указан') + "\n" +
+            "Начислить бонусов: " + code;
+
+        ctx.telegram.sendMessage(configService.get('HEADSHOT_ADMIN_GROUP_ID'), message, {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "✅ Начислено",
+                            callback_data: 'chest-bonuses-accrued-' + box_id + '-' + user.chat_id,
+                        },
+                    ],
+                ],
+            },
+        })
+    }
+
     static async setMessageProcessed(message_id: number) {
         const Message = model("Message", MessageSchema);
         const message = await Message.findOne({message_id: message_id});

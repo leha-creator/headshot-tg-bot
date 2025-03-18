@@ -20,10 +20,12 @@ export const registerScene = composeWizardScene(
                 ref_user_name = ref_user.name;
             }
         }
+        console.log(ctx);
+        const message_entity = ctx.message ?? ctx.update.callback_query.message;
         const ref_code = crypto.webcrypto.getRandomValues(new Uint32Array(1)).toString();
         await updateOrInsert({
-            chat_id: ctx.message.chat.id,
-            name: ctx.message.from.username,
+            chat_id: message_entity.chat.id,
+            name: message_entity.from.username,
             ref_code: ref_code,
             city: undefined,
             join_code: ref_user_code,
@@ -32,9 +34,9 @@ export const registerScene = composeWizardScene(
         });
 
         try {
-            let message = 'Хэй, геймер\\! 👋 Я бот [HEADSHOT]((https://t.me/headshot_cyber)\\. Регайся, и бонус твой\\! 💰 Кнопка внизу 👇';
+            let message = '🚀 Регайся и забирай свой бонус\\! Кнопка внизу 👇';
             if (ref_user_name) {
-                message = 'Привет\\! Ваш друг ' + escapeText('@' + ref_user_name) + ' пригласил вас в [HEADSHOT]((https://t.me/headshot_cyber), и это круто\\! 🎉 Зарегистрируйтесь, чтобы получить приветственный бонус \\+ еще ' + (USER_JOIN_BY_REF_BONUS_QUANTITY - USER_BONUS_QUANTITY) + ' бонусных рублей на свой счет\\! 👇';
+                message = 'Ваш друг ' + escapeText('@' + ref_user_name) + ' пригласил вас в [HEADSHOT]((https://t.me/headshot_cyber), и это круто\\! 🎉 Зарегистрируйтесь, чтобы получить приветственный бонус \\+ еще ' + (USER_JOIN_BY_REF_BONUS_QUANTITY - USER_BONUS_QUANTITY) + ' бонусных рублей на свой счет\\! 👇';
             }
             ctx.reply(message, {
                 reply_markup: {
@@ -115,7 +117,9 @@ export const registerScene = composeWizardScene(
                         const ref_user = await User.findOne({ref_code: user.join_code});
                         user.is_subscribed = true;
                         await updateOrInsert(user);
-                        ctx.reply('Отлично! После проверки модератором мы вышлем вам сообщение о начислении бонуса.');
+                        ctx.reply('🎮 Отлично! Администратор уже проверяет твои данные, и скоро на твой счёт поступят бонусы. Как только они будут начислены, ты получишь уведомление. \n' +
+                            '\n' +
+                            'А пока можешь начать использовать бота — просто нажми на - /menu');
                         AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
                         return done();
                     }

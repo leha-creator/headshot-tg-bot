@@ -2,7 +2,7 @@ import { Context } from "telegraf";
 import {SceneContext, SceneSession} from "telegraf/scenes";
 
 export interface ISessionData {
-    courseLike: boolean;
+    address: number;
 }
 
 export interface IBotContext extends SceneContext, Context {
