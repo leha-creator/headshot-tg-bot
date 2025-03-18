@@ -56,9 +56,8 @@ export class Bot {
         this.initActions();
 
         schedule('* * * * *', async () => {
-            console.log('Рундук');
             const DailyBox = model("DailyBox", DailyBoxSchema);
-            const daily_boxes = await DailyBox.find({createdAt: {$gte: new Date().getTime() - 24 * 60 * 60 * 1000, $lt: new Date().getTime() - 60 * 1000}, next_notified: false});
+            const daily_boxes = await DailyBox.find({createdAt: {$lt: new Date().getTime() - 24 * 60 * 60 * 1000}, next_notified: false});
             for (const daily_box of daily_boxes) {
                 daily_box.next_notified = true;
                 await daily_box.updateOne(daily_box);
