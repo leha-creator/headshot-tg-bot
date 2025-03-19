@@ -6,6 +6,7 @@ import {DailyBoxSchema} from "../Models/DailyBox.model";
 import {CHEST_NUMBER} from "./chest.action";
 import {AdminService} from "../helpers/admin.service";
 import {UserSchema} from "../Models/User.model";
+import {increaseBonusCounter} from "../helpers/counters.service";
 
 const WIN_CODES = [15, 30, 50];
 
@@ -16,13 +17,15 @@ export class OpenedChestAction extends Action {
 
     handle(): void {
         this.bot.action(/^opened-chest-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx: any) => {
+            const chat_id = ctx.update.callback_query.from.id;
+            await increaseBonusCounter(chat_id, 'opened-chest');
+
             const opened_chest_id = ctx.match[1];
             const year = ctx.match[2];
             const month = ctx.match[3];
             const day = ctx.match[4];
             const now = new Date();
             const win_id = Math.floor(Math.random() * CHEST_NUMBER) + 1;
-            const chat_id = ctx.update.callback_query.from.id;
             const User = model("User", UserSchema);
             const user = await User.findOne({chat_id: chat_id});
             if (!user || !user.phone) {

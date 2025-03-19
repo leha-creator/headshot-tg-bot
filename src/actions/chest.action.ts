@@ -3,6 +3,7 @@ import {IBotContext} from "../context/context.interface";
 import {Action} from "./action.class";
 import {model} from "mongoose";
 import {DailyBoxSchema} from "../Models/DailyBox.model";
+import {increaseBonusCounter} from "../helpers/counters.service";
 
 export const CHEST_NUMBER = 9;
 
@@ -13,10 +14,13 @@ export class ChestAction extends Action {
 
     handle(): void {
         this.bot.action('chest', async (ctx: any) => {
+            const chat_id = ctx.update.callback_query.from.id;
+            await increaseBonusCounter(chat_id, 'chest');
+
             const now = new Date();
             const box_id = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDay();
             const DailyBox = model("DailyBox", DailyBoxSchema);
-            const isDailyBoxExist = await DailyBox.findOne({chat_id: ctx.update.callback_query.from.id, box_id: box_id});
+            const isDailyBoxExist = await DailyBox.findOne({chat_id: chat_id, box_id: box_id});
             if (isDailyBoxExist != null) {
                 return ctx.reply('Ты уже открывал рундук! Подожди 24 часа ⏳');
             }

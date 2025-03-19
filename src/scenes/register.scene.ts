@@ -30,7 +30,8 @@ export const registerScene = composeWizardScene(
             city: undefined,
             join_code: ref_user_code,
             is_bonus_accrued: false,
-            is_subscribed: false
+            is_subscribed: false,
+            counters: undefined,
         });
 
         try {
@@ -106,6 +107,7 @@ export const registerScene = composeWizardScene(
                     ref_code,
                     is_bonus_accrued: false,
                     is_subscribed: false,
+                    counters: undefined,
                 });
 
                 const chat_id = ctx.update.callback_query.from.id;

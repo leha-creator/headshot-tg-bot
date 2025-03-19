@@ -3,6 +3,7 @@ import {IBotContext} from "../context/context.interface";
 import {Action} from "./action.class";
 import {model} from "mongoose";
 import {UserSchema} from "../Models/User.model";
+import {increaseBonusCounter} from "../helpers/counters.service";
 
 export class RegisterAction extends Action {
     constructor(bot: Telegraf<IBotContext>) {
@@ -12,6 +13,8 @@ export class RegisterAction extends Action {
     handle(): void {
         this.bot.action('register', async (ctx) => {
             const chat_id = ctx.update.callback_query.from.id;
+            await increaseBonusCounter(chat_id, 'register');
+
             const User = model("User", UserSchema);
             const user = await User.findOne({chat_id: chat_id});
             if (user) {
