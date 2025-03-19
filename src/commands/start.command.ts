@@ -4,6 +4,7 @@ import {IBotContext} from "../context/context.interface";
 import {AdminService} from "../helpers/admin.service";
 import {model} from "mongoose";
 import {UserSchema} from "../Models/User.model";
+import {increaseBonusCounter} from "../helpers/counters.service";
 
 export class StartCommand extends Command {
     constructor(bot: Telegraf<IBotContext>, public adminService: AdminService) {
@@ -18,6 +19,9 @@ export class StartCommand extends Command {
             const User = model("User", UserSchema);
             const user = await User.findOne({chat_id: ctx.message.chat.id});
             if (user) {
+                const chat_id = ctx.update.message.from.id;
+                await increaseBonusCounter(chat_id, 'start');
+
                 await ctx.reply('Вы уже зарегистрированы');
             } else {
                 await ctx.reply('🎮 Хэй, геймер! 👋\n' +
