@@ -6,7 +6,7 @@ export interface IDailyBox
     is_success: boolean,
     is_bonus_accrued: boolean
     next_notified: boolean,
-    code: string|undefined,
+    code: number|string|undefined,
     box_id: string
 }
 
@@ -16,7 +16,7 @@ export const DailyBoxSchema = new Schema<IDailyBox>
     is_success: { type: Boolean, default: false },
     is_bonus_accrued: { type: Boolean, default: false },
     next_notified: { type: Boolean, default: false },
-    code: { type: String, required: false },
+    code: { type: Number, required: false },
     box_id: { type: String, required: true },
 }, {
     timestamps: true,

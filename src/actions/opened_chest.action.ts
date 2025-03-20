@@ -40,7 +40,7 @@ export class OpenedChestAction extends Action {
                     let code: undefined | number = undefined;
                     if (win_id == opened_chest_id) {
                         success = true;
-                        code = WIN_CODES[Math.floor(Math.random() * WIN_CODES.length) + 1];
+                        code = WIN_CODES[Math.floor(Math.random() * WIN_CODES.length)];
                     }
 
                     await DailyBox.create({
