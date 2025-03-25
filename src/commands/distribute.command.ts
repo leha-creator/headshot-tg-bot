@@ -36,12 +36,14 @@ export class DistributeCommand extends Command {
                                 const percent = Math.round(processed_counter / total_users * 1000) / 10;
                                 await this.bot.telegram.editMessageText(admin_chat_id, message.message_id, undefined, "Рассылка запущена (кол-во пользователей: " + total_users + ")\nПрогресс " + percent + "% (" + processed_counter + ")");
                             }
-                            await ctx.telegram.copyMessage(user.chat_id, ctx.message.chat.id, ctx.message.reply_to_message.message_id);
                         }
+
+                        await ctx.telegram.copyMessage(user.chat_id, ctx.message.chat.id, ctx.message.reply_to_message.message_id);
                     } catch (e) {
                         forbidden_counter += 1;
                         logger.error(e);
                     }
+
                     processed_counter += 1;
                 }
 
