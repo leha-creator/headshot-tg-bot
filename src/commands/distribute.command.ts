@@ -32,7 +32,7 @@ export class DistributeCommand extends Command {
                 for (const user of users) {
                     try {
                         if (total_users > 100) {
-                            if (processed_counter % 100 === 0) {
+                            if (processed_counter % 100 === 0 && processed_counter > 0) {
                                 const percent = Math.round(processed_counter / total_users * 1000) / 10;
                                 await this.bot.telegram.editMessageText(admin_chat_id, message.message_id, undefined, "Рассылка запущена (кол-во пользователей: " + total_users + ")\nПрогресс " + percent + "% (" + processed_counter + ")");
                             }
