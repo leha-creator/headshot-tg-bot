@@ -38,7 +38,7 @@ import {model} from "mongoose";
 import {MessageSchema} from "./Models/Message.model";
 import {UserSchema} from "./Models/User.model";
 import {AdminService, USER_REF_BONUS_QUANTITY} from "./helpers/admin.service";
-import {ModCommand, ModCommnds} from "./commands/mod.command";
+import {ModCommand} from "./commands/mod.command";
 import {UnmodCommand} from "./commands/unmod.command";
 import {logger} from "./helpers/logger";
 
