@@ -188,7 +188,6 @@ export class Bot {
         this.bot.action('user_not_registered', async (ctx: any) => {
             const Message = model("Message", MessageSchema);
             const message = await Message.findOne({message_id: ctx.update.callback_query.message.message_id});
-            console.log(message);
             if (message && message.chat_id !== undefined) {
                 const User = model("User", UserSchema);
                 const user = await User.findOne({chat_id: message.chat_id});

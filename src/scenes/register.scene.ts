@@ -20,7 +20,6 @@ export const registerScene = composeWizardScene(
                 ref_user_name = ref_user.name;
             }
         }
-        console.log(ctx);
         const message_entity = ctx.message ?? ctx.update.callback_query.message;
         const ref_code = crypto.webcrypto.getRandomValues(new Uint32Array(1)).toString();
         await updateOrInsert({
@@ -96,7 +95,6 @@ export const registerScene = composeWizardScene(
     },
     async (ctx: any, done: () => any) => {
         if (typeof ctx.update.callback_query !== 'undefined') {
-            console.log(ctx.update.callback_query.message.from);
             if (ctx.wizard.state.phone) {
                 const ref_code = crypto.webcrypto.getRandomValues(new Uint32Array(1)).toString();
                 await updateOrInsert({
