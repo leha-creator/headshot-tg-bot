@@ -3,7 +3,7 @@ import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
 import { AdminService } from "../helpers/admin.service";
 
-export class UnmodCommnds extends Command {
+export class UnmodCommand extends Command {
     constructor(bot: Telegraf<IBotContext>, public adminService: AdminService) {
         super(bot);
     }
