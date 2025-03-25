@@ -4,6 +4,7 @@ import { IBotContext } from "../context/context.interface";
 import { AdminService } from "../helpers/admin.service";
 import {model} from "mongoose";
 import {UserSchema} from "../Models/User.model";
+import {logger} from "../helpers/logger";
 
 export class DistributeCommand extends Command {
     constructor(bot: Telegraf<IBotContext>, public adminService: AdminService) {
@@ -24,7 +25,7 @@ export class DistributeCommand extends Command {
             const users = await User.find();
             await ctx.reply('Рассылка запущена (кол-во пользователей: ' + users.length + ')')
             for (const user of users) {
-                await ctx.telegram.copyMessage(user.chat_id, ctx.message.chat.id, ctx.message.reply_to_message.message_id)
+                await ctx.telegram.copyMessage(user.chat_id, ctx.message.chat.id, ctx.message.reply_to_message.message_id);
             }
 
             await ctx.reply('Рассылка завершена')

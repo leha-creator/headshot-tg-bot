@@ -40,6 +40,7 @@ import {UserSchema} from "./Models/User.model";
 import {AdminService, USER_REF_BONUS_QUANTITY} from "./helpers/admin.service";
 import {ModCommand, ModCommnds} from "./commands/mod.command";
 import {UnmodCommand} from "./commands/unmod.command";
+import {logger} from "./helpers/logger";
 
 export class Bot {
     bot: Telegraf<IBotContext>;
@@ -69,6 +70,10 @@ export class Bot {
 
             }
         })
+
+        this.bot.catch(err => {
+            logger.error(err)
+        });
 
         await this.bot.launch();
     }
