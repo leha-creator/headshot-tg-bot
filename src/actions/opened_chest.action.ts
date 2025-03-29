@@ -31,7 +31,7 @@ export class OpenedChestAction extends Action {
             if (!user || !user.phone) {
                 return ctx.reply('Зарегистрируйся и попробуй ещё раз!');
             }
-            if (now.getFullYear() == year && now.getMonth() == month && now.getDay() == day) {
+            if (now.getFullYear() == year && (now.getMonth() + 1) == month && now.getDate() == day) {
                 const DailyBox = model("DailyBox", DailyBoxSchema);
                 const box_id = year + '-' + month + '-' + day;
                 const isDailyBoxExist = await DailyBox.findOne({chat_id: chat_id, box_id: box_id});
