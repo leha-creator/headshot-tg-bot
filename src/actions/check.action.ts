@@ -37,7 +37,7 @@ export class CheckAction extends Action {
                     user.is_subscribed = true;
                     await user.updateOne(user);
                     ctx.reply('Отлично! После проверки модератором мы вышлем вам сообщение о начислении бонуса.');
-                    AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
+                    await AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
                     next();
                 } else {
                     return ctx.reply(`Вы не подписались на канал!`).then(() => next());

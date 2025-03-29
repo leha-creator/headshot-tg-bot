@@ -74,7 +74,13 @@ export class AdminService {
         });
     }
 
-    static sendMessagesToAdminOnSubscribe(user: IUser, ref_user: IUser | null, ctx) {
+    static async sendMessagesToAdminOnSubscribe(user: IUser, ref_user: IUser | null, ctx) {
+        const Message = model("Message", MessageSchema);
+        const isMessageExist = await Message.findOne({chat_id: user.chat_id});
+        if (isMessageExist && isMessageExist.message_id) {
+            return;
+        }
+
         let balance = USER_BONUS_QUANTITY;
         let message = "❗️Новый пользователь:\n" +
             "\n" +
@@ -109,7 +115,6 @@ export class AdminService {
                         ],
                     },
                 }).then((textMessage: any) => {
-                    const Message = model("Message", MessageSchema);
                     Message.create({
                         chat_id: user.chat_id,
                         referral_chat_id: ref_user.chat_id,

@@ -120,7 +120,7 @@ export const registerScene = composeWizardScene(
                         ctx.reply('🎮 Отлично! Администратор уже проверяет твои данные, и скоро на твой счёт поступят бонусы. Как только они будут начислены, ты получишь уведомление. \n' +
                             '\n' +
                             'А пока можешь начать использовать бота — просто нажми на - /menu');
-                        AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
+                        await AdminService.sendMessagesToAdminOnSubscribe(user, ref_user, ctx);
                         return done();
                     }
                 }
