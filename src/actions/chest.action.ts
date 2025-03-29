@@ -16,9 +16,9 @@ export class ChestAction extends Action {
         this.bot.action('chest', async (ctx: any) => {
             const chat_id = ctx.update.callback_query.from.id;
             await increaseBonusCounter(chat_id, 'chest');
-
             const now = new Date();
-            const box_id = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDay();
+            console.log(now.getDay());
+            const box_id = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
             const DailyBox = model("DailyBox", DailyBoxSchema);
             const isDailyBoxExist = await DailyBox.findOne({chat_id: chat_id, box_id: box_id});
             if (isDailyBoxExist != null) {
