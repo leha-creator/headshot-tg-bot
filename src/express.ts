@@ -67,21 +67,34 @@ export class ExpressServer {
 
             const Message = model("Message", MessageSchema);
             const bonuses = await Message.aggregate([
-                { "$group": {
-                        "_id": { "$toLower": "$balance" },
-                        "count": { "$sum": 1 }
-                    } },
-                { "$group": {
+                {
+                    "$match": {
+                        createdAt: {
+                            $gte: startDate,
+                            $lte: endDate
+                        },
+                    }
+                },
+                {
+                    "$group": {
+                        "_id": {"$toLower": "$balance"},
+                        "count": {"$sum": 1}
+                    }
+                },
+                {
+                    "$group": {
                         "_id": null,
                         "counts": {
-                            "$push": { "k": "$_id", "v": "$count" }
+                            "$push": {"k": "$_id", "v": "$count"}
                         }
-                    } },
-                { "$replaceRoot": {
-                        "newRoot": { "$arrayToObject": "$counts" }
-                    } }
+                    }
+                },
+                {
+                    "$replaceRoot": {
+                        "newRoot": {"$arrayToObject": "$counts"}
+                    }
+                }
             ]);
-
 
 
             const result = {
