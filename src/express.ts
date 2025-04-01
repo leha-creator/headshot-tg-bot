@@ -69,9 +69,9 @@ export class ExpressServer {
             const bonuses = await Message.aggregate([
                 {
                     "$match": {
-                        createdAt: {
-                            $gte: startDate,
-                            $lte: endDate
+                        "createdAt": {
+                            $gte: new Date(startDate),
+                            $lte: new Date(endDate)
                         },
                     }
                 },

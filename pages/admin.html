@@ -151,16 +151,17 @@
         // Заполняем бонусы
         const bonusesList = document.getElementById('bonusesList');
         bonusesList.innerHTML = '';
-
-        Object.entries(data.bonuses[0]).forEach((bonus) => {
-            const bonusItem = document.createElement('div');
-            bonusItem.className = 'bonus-item';
-            bonusItem.innerHTML = `
+        if (data.bonuses[0] !== undefined) {
+            Object.entries(data.bonuses[0]).forEach((bonus) => {
+                const bonusItem = document.createElement('div');
+                bonusItem.className = 'bonus-item';
+                bonusItem.innerHTML = `
                     <span>Бонус ${bonus[0]}:</span>
                     <strong>${bonus[1]}</strong>
                 `;
-            bonusesList.appendChild(bonusItem);
-        });
+                bonusesList.appendChild(bonusItem);
+            });
+        }
 
         // Создаем график
         createChart(data);
