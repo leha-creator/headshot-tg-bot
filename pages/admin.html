@@ -152,12 +152,12 @@
         const bonusesList = document.getElementById('bonusesList');
         bonusesList.innerHTML = '';
 
-        data.bonuses.forEach((bonus) => {
+        Object.entries(data.bonuses[0]).forEach((bonus) => {
             const bonusItem = document.createElement('div');
             bonusItem.className = 'bonus-item';
             bonusItem.innerHTML = `
-                    <span>Бонус ${bonus.bonus_key}:</span>
-                    <strong>${bonus.bonus_value}</strong>
+                    <span>Бонус ${bonus[0]}:</span>
+                    <strong>${bonus[1]}</strong>
                 `;
             bonusesList.appendChild(bonusItem);
         });

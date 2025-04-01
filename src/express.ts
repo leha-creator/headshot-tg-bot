@@ -82,24 +82,14 @@ export class ExpressServer {
                     } }
             ]);
 
-            const bonuses_array: Array<any> = [];
-            if (Array.isArray(bonuses)) {
-                bonuses.forEach((value) => {
-                    bonuses_array.push({
-                        bonus_key: Object.keys(value)[0],
-                        bonus_value: Object.entries(value)[0][1],
-                    })
-                })
-            }
 
-            console.log(bonuses_array);
 
             const result = {
                 pressed_start: pressed_start,
                 with_join_code: with_join_code,
                 without_join_code: without_join_code,
                 registered: registered,
-                bonuses: bonuses_array,
+                bonuses: bonuses,
             }
 
             return response.json(result);
