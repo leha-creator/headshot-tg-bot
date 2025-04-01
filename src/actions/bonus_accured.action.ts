@@ -23,6 +23,7 @@ export class BonusAccruedAction extends Action {
                         user.is_bonus_accrued = true;
                         ctx.telegram.sendMessage(user.chat_id, `🎉 Вам успешно начислили ${message.balance} бонусных рублей!`);
                         await user.updateOne(user);
+                        await AdminService.setMessageProcessed(message.message_id, true);
                         await this.bot.telegram.editMessageText(ctx.chat.id, ctx.update.callback_query.message.message_id, undefined, 'Пользователю ' + user.phone + ' зачислено ' + message.balance + ' бонусов ✅');
                     }
                 } else {
@@ -36,12 +37,12 @@ export class BonusAccruedAction extends Action {
                         user.is_bonus_accrued = true;
                         await user.updateOne(user);
 
+                        await AdminService.setMessageProcessed(message.message_id, true);
                         ctx.telegram.sendMessage(user.chat_id, `Поздравляем! Вы успешно подписались! ${message.balance} рублей скоро зачислятся на ваш бонусный счет. Пригласите друга по этой ссылке и получите оба на каждого по 150 бонусных рублей! Реферальная ссылка: https://t.me/headshot_club_bot?start=` + user.ref_code);
                         await this.bot.telegram.editMessageText(ctx.chat.id, ctx.update.callback_query.message.message_id, undefined, 'Пользователю ' + user.phone + ' зачислено ' + message.balance + ' бонусов ✅');
                     }
                 }
 
-                await AdminService.setMessageProcessed(message.message_id);
             }
         });
     }

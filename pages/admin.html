@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика по датам</title>
+    <!-- Bootstrap CSS -->
+    <link href="http://localhost:8443/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .stat-card {
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .bonus-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="mb-4">Статистика по датам</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form id="dateForm">
+                <div class="row">
+                    <div class="col-md-5">
+                        <label for="startDate" class="form-label">Дата начала</label>
+                        <input type="date" class="form-control" id="startDate" required>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="endDate" class="form-label">Дата окончания</label>
+                        <input type="date" class="form-control" id="endDate" required>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Отправить</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="loadingSpinner" class="text-center my-5" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+        <p class="mt-2">Загрузка данных...</p>
+    </div>
+
+    <div id="statsContainer" style="display: none;">
+        <h2 class="mb-4">Результаты</h2>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="stat-card bg-light">
+                    <h4>Общая статистика</h4>
+                    <div class="mt-3">
+                        <p>Нажали "Start": <strong id="pressedStart">0</strong></p>
+                        <p>С кодом присоединения: <strong id="withJoinCode">0</strong></p>
+                        <p>Без кода присоединения: <strong id="withoutJoinCode">0</strong></p>
+                        <p>Зарегистрировались: <strong id="registered">0</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="stat-card bg-light">
+                    <h4>Бонусы</h4>
+                    <div id="bonusesList" class="mt-3">
+                        <!-- Бонусы будут добавлены здесь -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="stat-card">
+                    <h4>Визуализация данных</h4>
+                    <div class="chart-container">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS и Chart.js -->
+<script src="http://localhost:8443/bootstrap.bundle.min.js"></script>
+<script src="http://localhost:8443/chart.js"></script>
+
+<script>
+    document.getElementById('dateForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+            alert('Пожалуйста, заполните обе даты');
+            return;
+        }
+
+        // Показать спиннер загрузки
+        document.getElementById('loadingSpinner').style.display = 'block';
+        document.getElementById('statsContainer').style.display = 'none';
+
+        // Здесь должен быть реальный запрос к серверу
+        // Для демонстрации используем имитацию ответа сервера
+        const data = {
+            start_date: startDate,
+            end_date: endDate,
+        }
+        const response = await fetch('http://localhost:8443/stats', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json;charset=UTF-8',
+            },
+            body: JSON.stringify(data),
+        })
+
+        if (response.ok) {
+            const response_json = await response.json();
+            displayStats(response_json);
+        } else {
+            alert('Ошибка при получении данных');
+        }
+
+        // Скрыть спиннер загрузки
+        document.getElementById('loadingSpinner').style.display = 'none';
+
+    });
+
+    function displayStats(data) {
+        // Заполняем общую статистику
+        document.getElementById('pressedStart').textContent = data.pressed_start;
+        document.getElementById('withJoinCode').textContent = data.with_join_code;
+        document.getElementById('withoutJoinCode').textContent = data.without_join_code;
+        document.getElementById('registered').textContent = data.registered;
+
+        // Заполняем бонусы
+        const bonusesList = document.getElementById('bonusesList');
+        bonusesList.innerHTML = '';
+
+        data.bonuses.forEach((bonus) => {
+            const bonusItem = document.createElement('div');
+            bonusItem.className = 'bonus-item';
+            bonusItem.innerHTML = `
+                    <span>Бонус ${bonus.bonus_key}:</span>
+                    <strong>${bonus.bonus_value}</strong>
+                `;
+            bonusesList.appendChild(bonusItem);
+        });
+
+        // Создаем график
+        createChart(data);
+
+        // Показываем контейнер с результатами
+        document.getElementById('statsContainer').style.display = 'block';
+    }
+
+    function createChart(data) {
+        const ctx = document.getElementById('statsChart').getContext('2d');
+
+        // Удаляем предыдущий график, если он существует
+        if (window.statsChart !== undefined && window.statsChart.destroy) {
+            window.statsChart.destroy();
+        }
+
+        window.statsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Нажали Start', 'С кодом', 'Без кода', 'Зарегистрировались'],
+                datasets: [{
+                    label: 'Количество',
+                    data: [
+                        data.pressed_start,
+                        data.with_join_code,
+                        data.without_join_code,
+                        data.registered
+                    ],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(153, 102, 255, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

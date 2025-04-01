@@ -169,11 +169,12 @@ export class AdminService {
         })
     }
 
-    static async setMessageProcessed(message_id: number) {
+    static async setMessageProcessed(message_id: number, is_bonus_accrued = false) {
         const Message = model("Message", MessageSchema);
         const message = await Message.findOne({message_id: message_id});
         if (message) {
             message.is_processed = true;
+            message.is_bonus_accrued = is_bonus_accrued;
             await message.updateOne(message);
         }
     }

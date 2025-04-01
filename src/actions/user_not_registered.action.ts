@@ -28,7 +28,7 @@ export class UserNotRegisteredAction extends Action {
                             is_processed: false,
                         });
                         if (ref_message && ref_message.message_id) {
-                            await AdminService.setMessageProcessed(ref_message.message_id);
+                            await AdminService.setMessageProcessed(ref_message.message_id, false);
                             await this.bot.telegram.editMessageText(ctx.chat.id, ref_message.message_id, undefined, 'Пользователь, который отправил реферальную ссылку, не зарегистрирован в системе.');
                         }
                     }
@@ -52,7 +52,7 @@ export class UserNotRegisteredAction extends Action {
                     });
                 }
 
-                await AdminService.setMessageProcessed(message.message_id);
+                await AdminService.setMessageProcessed(message.message_id, false);
             }
         });
     }

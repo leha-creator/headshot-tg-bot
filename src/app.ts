@@ -3,12 +3,16 @@ import {logger} from "./helpers/logger";
 import {AdminService} from "./helpers/admin.service";
 import {connect} from 'mongoose';
 import {Bot} from "./bot";
+import express from "express";
+import {ExpressServer} from "./express";
 
 const configService = ConfigService.getInstance();
 const adminService = AdminService.getInstance();
 const bot = new Bot(configService, adminService);
+const expressServer = new ExpressServer();
 
 const start = async () => {
+    await expressServer.init();
     await bot.init();
     logger.info('app started');
 };
