@@ -41,6 +41,14 @@ export class ExpressServer {
                 }
             });
 
+            const users_with_phone = await User.countDocuments({
+                createdAt: {
+                    $gte: startDate,
+                    $lte: endDate
+                },
+                phone: {$ne: undefined}
+            });
+
             const with_join_code = await User.countDocuments({
                 createdAt: {
                     $gte: startDate,
@@ -99,6 +107,7 @@ export class ExpressServer {
 
             const result = {
                 pressed_start: pressed_start,
+                users_with_phone: with_phone,
                 with_join_code: with_join_code,
                 without_join_code: without_join_code,
                 registered: registered,
