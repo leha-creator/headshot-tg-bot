@@ -1,11 +1,22 @@
 import express, {Express} from "express";
 import {model} from "mongoose";
 import {UserSchema} from "./Models/User.model";
-import path from "node:path";
 import {MessageSchema} from "./Models/Message.model";
+import {IConfigServise} from "./config/config.interface";
+import {AdminService} from "./helpers/admin.service";
+import {Telegraf} from "telegraf";
+import {IBotContext} from "./context/context.interface";
+import LocalSession from "telegraf-session-local";
+import {Bot} from "./bot";
+import {ConfigService} from "./config/configService";
 
 export class ExpressServer {
     expressApp: Express | undefined;
+
+    constructor(private readonly bot: Bot, private readonly configService: ConfigService) {
+        this.configService = configService;
+        this.bot = bot;
+    }
 
     async init() {
         this.expressApp = express();
@@ -65,7 +76,7 @@ export class ExpressServer {
                 join_code: '0'
             });
 
-            const registered = await User.countDocuments({
+            const registered = await User.find({
                 createdAt: {
                     $gte: startDate,
                     $lte: endDate
@@ -103,14 +114,27 @@ export class ExpressServer {
                     }
                 }
             ]);
-
+            let blocked = 0;
+            let unsubscribed = 0;
+            for (const user of registered) {
+                try {
+                    const chat_member = await this.bot.bot.telegram.getChatMember(this.configService.get('HEADSHOT_CHANNEL_ID'), user.chat_id);
+                    if (chat_member == undefined || chat_member.status != 'member') {
+                        unsubscribed += 1;
+                    }
+                } catch (e) {
+                    blocked += 1;
+                }
+            }
 
             const result = {
                 pressed_start: pressed_start,
                 with_phone: with_phone,
                 with_join_code: with_join_code,
                 without_join_code: without_join_code,
-                registered: registered,
+                registered: registered.length,
+                unsubscribed: unsubscribed,
+                blocked: blocked,
                 bonuses: bonuses,
             }
 

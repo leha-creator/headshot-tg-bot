@@ -9,7 +9,7 @@ import {ExpressServer} from "./express";
 const configService = ConfigService.getInstance();
 const adminService = AdminService.getInstance();
 const bot = new Bot(configService, adminService);
-const expressServer = new ExpressServer();
+const expressServer = new ExpressServer(bot, configService);
 
 const start = async () => {
     await expressServer.init();

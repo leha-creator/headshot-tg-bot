@@ -66,9 +66,11 @@
                     <div class="mt-3">
                         <p>Нажали "Start": <strong id="pressedStart">0</strong></p>
                         <p>Поделились контактом: <strong id="withPhone">0</strong></p>
+                        <p>Подписались на канал: <strong id="registered">0</strong></p>
+                        <p>Отписались от канала: <strong id="unsubscribed">0</strong></p>
+                        <p>Заблокировали: <strong id="blocked">0</strong></p>
                         <p>С кодом присоединения: <strong id="withJoinCode">0</strong></p>
                         <p>Без кода присоединения: <strong id="withoutJoinCode">0</strong></p>
-                        <p>Зарегистрировались: <strong id="registered">0</strong></p>
                     </div>
                 </div>
             </div>
@@ -146,9 +148,11 @@
         // Заполняем общую статистику
         document.getElementById('pressedStart').textContent = data.pressed_start;
         document.getElementById('withPhone').textContent = data.with_phone;
+        document.getElementById('registered').textContent = data.registered;
+        document.getElementById('unsubscribed').textContent = data.unsubscribed;
+        document.getElementById('blocked').textContent = data.blocked;
         document.getElementById('withJoinCode').textContent = data.with_join_code;
         document.getElementById('withoutJoinCode').textContent = data.without_join_code;
-        document.getElementById('registered').textContent = data.registered;
 
         // Заполняем бонусы
         const bonusesList = document.getElementById('bonusesList');
@@ -183,15 +187,15 @@
         window.statsChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Нажали Start', 'Поделились контактом', 'С кодом', 'Без кода', 'Зарегистрировались'],
+                labels: ['Нажали Start', 'Поделились контактом', 'Зарегистрировались', 'С кодом', 'Без кода'],
                 datasets: [{
                     label: 'Количество',
                     data: [
                         data.pressed_start,
                         data.with_phone,
+                        data.registered,
                         data.with_join_code,
                         data.without_join_code,
-                        data.registered
                     ],
                     backgroundColor: [
                         'rgba(54, 162, 235, 0.5)',
