@@ -107,7 +107,7 @@ export class ExpressServer {
 
             const result = {
                 pressed_start: pressed_start,
-                users_with_phone: with_phone,
+                with_phone: with_phone,
                 with_join_code: with_join_code,
                 without_join_code: without_join_code,
                 registered: registered,
