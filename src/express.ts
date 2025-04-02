@@ -41,7 +41,7 @@ export class ExpressServer {
                 }
             });
 
-            const users_with_phone = await User.countDocuments({
+            const with_phone = await User.countDocuments({
                 createdAt: {
                     $gte: startDate,
                     $lte: endDate
