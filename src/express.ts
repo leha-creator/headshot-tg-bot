@@ -223,7 +223,7 @@ export class ExpressServer {
             const saveData:ISnakeBonus = {
                 chat_id: request.body.chat_id,
                 score: request.body.score,
-                bonusScore: request.body.bonusScore || 0,
+                bonusScore: request.body.bonusScore && request.body.bonusScore != 'null' ? request.body.bonusScore : 0,
             }
 
             const currentBonusScore = await SnakeBonus.findOne({
