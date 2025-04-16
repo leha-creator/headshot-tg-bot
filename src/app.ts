@@ -30,3 +30,4 @@ async function connectMongo() {
 connectMongo().then(async () => {
     await start();
 });
+

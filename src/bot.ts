@@ -41,6 +41,7 @@ import {AdminService, USER_REF_BONUS_QUANTITY} from "./helpers/admin.service";
 import {ModCommand} from "./commands/mod.command";
 import {UnmodCommand} from "./commands/unmod.command";
 import {logger} from "./helpers/logger";
+import {SnakeBonusAccruedAction} from "./actions/snake_bonuses_accrued.action";
 
 export class Bot {
     bot: Telegraf<IBotContext>;
@@ -156,6 +157,7 @@ export class Bot {
 
     initActions() {
         this.actions = [
+            new SnakeBonusAccruedAction(this.bot),
             new BonusAccruedAction(this.bot),
             new BookAction(this.bot),
             new CheckAction(this.bot, this.configService),

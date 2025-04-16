@@ -9,6 +9,9 @@ import {IBotContext} from "./context/context.interface";
 import LocalSession from "telegraf-session-local";
 import {Bot} from "./bot";
 import {ConfigService} from "./config/configService";
+import {SnakeBonusSchema, ISnakeBonus} from "./Models/SnakeBonus.model";
+import cors, {CorsOptions} from 'cors'
+import {type} from "node:os";
 
 export class ExpressServer {
     expressApp: Express | undefined;
@@ -20,10 +23,23 @@ export class ExpressServer {
 
     async init() {
         this.expressApp = express();
+        this.expressApp.set('view engine', 'html');
+
         this.expressApp.use(express.json());
-        this.expressApp.listen(8443, () => console.log(`Running on port 8443`));
+
+        const corsOptions:CorsOptions = {
+            origin: '*',
+            methods:['get', 'post'],
+            optionsSuccessStatus: 200,
+        };
+
+        this.expressApp.use(cors(corsOptions));
         this.expressApp.use(express.static(__dirname + '/../pages'));
+
+        this.expressApp.listen(8443, 'localhost', () => console.log(`Running on port 8443`));
+
         await this.stats()
+        await this.snake()
     }
 
     async stats() {
@@ -139,6 +155,95 @@ export class ExpressServer {
             }
 
             return response.json(result);
+        });
+    }
+
+    async snake() {
+        if (this.expressApp == undefined) {
+            return null;
+        }
+
+        this.expressApp.get('/snake-game/timer/', async (request, response) => {
+            const chatID = request.query.chat_id;
+
+            if(!chatID) {
+                response.statusCode = 400;
+                return response.json({"message": {chatID: "chat id is required"}});
+            }
+
+            const SnakeBonus = model("SnakeBonus", SnakeBonusSchema);
+            const snakeBonus:any = await SnakeBonus.findOne({
+                createdAt: {$gt: new Date().getTime() - 72 * 60 * 60 * 1000},
+                bonusScore: {$ne: 0},
+                chat_id: chatID,
+            }).sort('-createdAt');
+
+            if(!snakeBonus){
+                return response.json({
+                    status: 'ok',
+                    result: {
+                        timer: false
+                    }
+                });
+            }
+
+            const currentDate = new Date();
+            const bonusDate = new Date(snakeBonus.createdAt)
+            const datesDiff = currentDate.getTime() - (bonusDate.getTime() + 72 * 60 * 60 * 1000);
+
+            if(datesDiff >= 0){
+                return response.json({
+                    status: 'ok',
+                    result: {
+                        timer: false
+                    }
+                });
+            }
+
+            return response.json({
+                status: 'ok',
+                result: {
+                    timer: datesDiff
+                }
+            });
+        });
+
+        this.expressApp.post('/snake-game/end', async (request, response) => {
+            if(!request.body.chat_id) {
+                response.statusCode = 400;
+                return response.json({"message": {chatID: "chat id is required"}});
+            }
+
+            if(!request.body.score) {
+                response.statusCode = 400;
+                return response.json({"message": {score: "score is required"}});
+            }
+            const SnakeBonus = model("SnakeBonus", SnakeBonusSchema);
+
+            const saveData:ISnakeBonus = {
+                chat_id: request.body.chat_id,
+                score: request.body.score,
+                bonusScore: request.body.bonusScore || 0,
+            }
+
+            const currentBonusScore = await SnakeBonus.findOne({
+                createdAt: {$gt: new Date().getTime() - 72 * 60 * 60 * 1000},
+                bonusScore: {$ne: 0},
+                chat_id: saveData.chat_id
+            });
+
+            const snakeBonus = await SnakeBonus.create(saveData)
+
+            if(!currentBonusScore && saveData.bonusScore && typeof saveData.bonusScore === 'number'){
+                await AdminService.sendMessagesToAdminOnSnakeWin(saveData.chat_id, snakeBonus, this.bot.bot);
+            }
+
+            return response.json({
+                status: 'ok',
+                result: {
+                    message: 'Бонусы записаны на ваш счет. Можете использовать их в наших клубах'
+                }
+            });
         });
     }
 }

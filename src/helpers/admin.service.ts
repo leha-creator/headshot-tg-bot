@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import {logger} from './logger';
 import {model} from "mongoose";
 import {MessageSchema} from "../Models/Message.model";
-import {IUser} from "../Models/User.model";
+import {IUser, UserSchema} from "../Models/User.model";
 import {ConfigService} from "../config/configService";
 
 const configService = ConfigService.getInstance();
@@ -144,6 +144,41 @@ export class AdminService {
         }).then((textMessage: any) => {
             const Message = model("Message", MessageSchema);
             Message.create({chat_id: user.chat_id, message_id: textMessage.message_id, balance: balance});
+        })
+    }
+
+    static async sendMessagesToAdminOnSnakeWin(chat_id: number, bonus: any, ctx ) {
+        const User = model("User", UserSchema);
+        const user = await User.findOne({chat_id: chat_id});
+
+        if(!user) {
+            logger.info({
+                chat_id: chat_id,
+                score: bonus.bonusScore,
+                message: 'Cannot send message to admin page. User is not found',
+            })
+
+            return
+        }
+
+        const message = "🐍Выигрыш в \"Змейке\":\n" +
+            "\n" +
+            "Номер: " + user.phone + "\n" +
+            "ID: @" + user.name + "\n" +
+            "Город: " + (user.city ?? 'Не указан') + "\n" +
+            "Начислить бонусов: " + bonus.bonusScore;
+
+        ctx.telegram.sendMessage(configService.get('HEADSHOT_ADMIN_GROUP_ID'), message, {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "✅ Начислено",
+                            callback_data: 'snake-bonuses-accrued-' + bonus._id + '-' + user.chat_id,
+                        },
+                    ],
+                ],
+            },
         })
     }
 

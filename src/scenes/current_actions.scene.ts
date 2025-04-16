@@ -3,27 +3,27 @@ import {composeWizardScene} from "../helpers/scene.servise";
 export const ACTIONS = {
     1: {
         name: '🎂 День рождения',
-        price_url: 'https://static.tildacdn.com/tild3433-6365-4533-a664-643237333436/__2.jpg',
+        price_url: 'https://static.tildacdn.com/tild3534-6162-4133-a132-353962653238/IMG_20250410_120347_.jpg',
     },
     2: {
         name: '👫 Приведи друга',
-        price_url: 'https://static.tildacdn.com/tild3564-6564-4336-a630-626237383135/_-.jpg',
+        price_url: 'https://static.tildacdn.com/tild3934-3236-4531-b134-383535323936/---1_1.jpg',
     },
     3: {
         name: '🎰 Испытай удачу',
-        price_url: 'https://static.tildacdn.com/tild3430-3963-4138-b761-366536623861/_2.jpg',
+        price_url: 'https://static.tildacdn.com/tild3066-3739-4436-b063-396638626637/IMG_20250410_120359_.jpg',
     },
     4: {
         name: '🆕 Новым клиентам',
-        price_url: 'https://static.tildacdn.com/tild3736-3335-4536-b930-333961356338/_.jpg',
+        price_url: 'https://static.tildacdn.com/tild6561-3665-4863-b630-303537363066/IMG_20250410_120415_.jpg',
     },
     5: {
         name: '🚕 Бонусы за Такси',
-        price_url: 'https://static.tildacdn.com/tild6432-3965-4631-b561-343235343030/photo_2024-12-14_113.jpeg',
+        price_url: 'https://static.tildacdn.com/tild3664-6130-4262-b630-633563656264/IMG_20250410_120409_.jpg',
     },
     6: {
         name: '📝 Бонусы за отзыв',
-        price_url: 'https://static.tildacdn.com/tild6435-6662-4161-a138-356464343962/IMG_6615.jpeg',
+        price_url: 'https://static.tildacdn.com/tild3631-3231-4434-a436-313465616437/IMG_20250410_120405_.jpg',
     }
 }
 

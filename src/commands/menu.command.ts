@@ -2,6 +2,7 @@ import { Telegraf } from "telegraf";
 import { Command } from "./command.class";
 import { IBotContext } from "../context/context.interface";
 import {increaseBonusCounter} from "../helpers/counters.service";
+import {webApp} from "telegraf/typings/button";
 
 export class MenuCommand extends Command {
     constructor(bot: Telegraf<IBotContext>) {
@@ -44,6 +45,14 @@ export class MenuCommand extends Command {
                             {
                                 text: "🎁 Рундук",
                                 callback_data: 'chest',
+                            },
+                        ],
+                        [
+                            {
+                                text: "🐍 Змейка",
+                                web_app: {
+                                    url: `https://lk.adswap.ru/snake-game?chat_id=${chat_id}`
+                                }
                             },
                         ],
                     ],
