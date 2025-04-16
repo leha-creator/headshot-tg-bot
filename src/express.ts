@@ -208,22 +208,22 @@ export class ExpressServer {
             });
         });
 
-        this.expressApp.get('/snake-game/end', async (request, response) => {
-            if(!request.query.chat_id) {
+        this.expressApp.post('/snake-game/end', async (request, response) => {
+            if(!request.body.chat_id) {
                 response.statusCode = 400;
                 return response.json({"message": {chatID: "chat id is required"}});
             }
 
-            if(!request.query.score) {
+            if(!request.body.score) {
                 response.statusCode = 400;
                 return response.json({"message": {score: "score is required"}});
             }
             const SnakeBonus = model("SnakeBonus", SnakeBonusSchema);
 
             const saveData:ISnakeBonus = {
-                chat_id: request.query.chat_id,
-                score: request.query.score,
-                bonusScore: request.query.bonusScore || 0,
+                chat_id: request.body.chat_id,
+                score: request.body.score,
+                bonusScore: request.body.bonusScore || 0,
             }
 
             const currentBonusScore = await SnakeBonus.findOne({
