@@ -36,7 +36,7 @@ export class ExpressServer {
         this.expressApp.use(cors(corsOptions));
         this.expressApp.use(express.static(__dirname + '/../pages'));
 
-        this.expressApp.listen(8443, 'localhost', () => console.log(`Running on port 8443`));
+        this.expressApp.listen(8443, () => console.log(`Running on port 8443`));
 
         await this.stats()
         await this.snake()
