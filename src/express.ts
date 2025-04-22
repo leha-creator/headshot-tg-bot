@@ -27,9 +27,9 @@ export class ExpressServer {
 
         this.expressApp.use(express.json());
 
-        const corsOptions:CorsOptions = {
+        const corsOptions: CorsOptions = {
             origin: '*',
-            methods:['get', 'post'],
+            methods: ['get', 'post'],
             optionsSuccessStatus: 200,
         };
 
@@ -57,8 +57,8 @@ export class ExpressServer {
                 response.statusCode = 400;
                 return response.json({"text": {chatId: "start_date is required"}});
             }
-            const startDate = request.body.start_date;
-            const endDate = request.body.end_date;
+            const startDate = request.body.start_date + "T00:00:00";
+            const endDate = request.body.end_date + "T23:59:59";
 
             const User = model("User", UserSchema);
             const pressed_start = await User.countDocuments({
@@ -81,16 +81,13 @@ export class ExpressServer {
                     $gte: startDate,
                     $lte: endDate
                 },
-                join_code: {$ne: '0'}
+                $and: [
+                    {join_code: {$ne: '0'}},
+                    {join_code: {$ne: ''}}
+                ]
             });
 
-            const without_join_code = await User.countDocuments({
-                createdAt: {
-                    $gte: startDate,
-                    $lte: endDate
-                },
-                join_code: '0'
-            });
+            const without_join_code = pressed_start - with_join_code;
 
             const registered = await User.find({
                 createdAt: {
@@ -166,19 +163,19 @@ export class ExpressServer {
         this.expressApp.get('/snake-game/timer/', async (request, response) => {
             const chatID = request.query.chat_id;
 
-            if(!chatID) {
+            if (!chatID) {
                 response.statusCode = 400;
                 return response.json({"message": {chatID: "chat id is required"}});
             }
 
             const SnakeBonus = model("SnakeBonus", SnakeBonusSchema);
-            const snakeBonus:any = await SnakeBonus.findOne({
+            const snakeBonus: any = await SnakeBonus.findOne({
                 createdAt: {$gt: new Date().getTime() - 72 * 60 * 60 * 1000},
                 bonusScore: {$ne: 0},
                 chat_id: chatID,
             }).sort('-createdAt');
 
-            if(!snakeBonus){
+            if (!snakeBonus) {
                 return response.json({
                     status: 'ok',
                     result: {
@@ -191,7 +188,7 @@ export class ExpressServer {
             const bonusDate = new Date(snakeBonus.createdAt)
             const datesDiff = currentDate.getTime() - (bonusDate.getTime() + 72 * 60 * 60 * 1000);
 
-            if(datesDiff >= 0){
+            if (datesDiff >= 0) {
                 return response.json({
                     status: 'ok',
                     result: {
@@ -209,18 +206,18 @@ export class ExpressServer {
         });
 
         this.expressApp.post('/snake-game/end', async (request, response) => {
-            if(!request.body.chat_id) {
+            if (!request.body.chat_id) {
                 response.statusCode = 400;
                 return response.json({"message": {chatID: "chat id is required"}});
             }
 
-            if(!request.body.score) {
+            if (!request.body.score) {
                 response.statusCode = 400;
                 return response.json({"message": {score: "score is required"}});
             }
             const SnakeBonus = model("SnakeBonus", SnakeBonusSchema);
 
-            const saveData:ISnakeBonus = {
+            const saveData: ISnakeBonus = {
                 chat_id: request.body.chat_id,
                 score: request.body.score,
                 bonusScore: request.body.bonusScore && request.body.bonusScore != 'null' ? Number(request.body.bonusScore) : 0,
@@ -234,7 +231,7 @@ export class ExpressServer {
 
             const snakeBonus = await SnakeBonus.create(saveData)
 
-            if(!currentBonusScore && saveData.bonusScore && typeof saveData.bonusScore === 'number'){
+            if (!currentBonusScore && saveData.bonusScore && typeof saveData.bonusScore === 'number') {
                 await AdminService.sendMessagesToAdminOnSnakeWin(saveData.chat_id, snakeBonus, this.bot.bot);
             }
 
