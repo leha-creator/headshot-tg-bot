@@ -377,6 +377,9 @@ export class ExpressServer {
                 $gte: startDate,
                 $lte: endDate
             },
+            code: {
+                $gte: 0,
+            }
         });
 
         const dailyBoxesByChatId: Record<number, IDailyBox[]> = {};
@@ -399,6 +402,9 @@ export class ExpressServer {
                 $gte: startDate,
                 $lte: endDate
             },
+            bonusScore: {
+                $gte: 0,
+            }
         });
 
         const snakeBonusesByChatId: Record<number, ISnakeBonus[]> = {};
