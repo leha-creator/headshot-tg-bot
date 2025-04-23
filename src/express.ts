@@ -15,7 +15,7 @@ interface CombinedData {
     name: string | undefined;
     city: string | undefined;
     phone: number | undefined;
-    balance: number;
+    balance: string|number|undefined;
     is_bonus_accrued: boolean;
     type: string;
 }
