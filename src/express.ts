@@ -290,9 +290,9 @@ export class ExpressServer {
         const users = await User.find({});
 
         // Получаем сообщения
-        const messagesByChatId = this.getMessages(startDate, endDate);
-        const dailyBoxesByChatId = this.getDailyBoxes(startDate, endDate);
-        const snakesByChatId = this.getSnakes(startDate, endDate);
+        const messagesByChatId = await this.getMessages(startDate, endDate);
+        const dailyBoxesByChatId = await this.getDailyBoxes(startDate, endDate);
+        const snakesByChatId = await this.getSnakes(startDate, endDate);
 
 
         // Объединяем данные
