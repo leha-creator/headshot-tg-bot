@@ -1,7 +1,7 @@
 import express, {Express} from "express";
 import {model} from "mongoose";
 import {UserSchema} from "./Models/User.model";
-import {MessageSchema} from "./Models/Message.model";
+import {IMessage, MessageSchema} from "./Models/Message.model";
 import {AdminService} from "./helpers/admin.service";
 import {Bot} from "./bot";
 import {ConfigService} from "./config/configService";
@@ -294,7 +294,7 @@ export class ExpressServer {
 
         // Получаем сообщения
         const Message = model("Message", MessageSchema);
-        const messages = await Message.find({
+        const messages: IMessage[] = await Message.find({
             createdAt: {
                 $gte: startDate,
                 $lte: endDate
@@ -302,13 +302,16 @@ export class ExpressServer {
         });
 
         // Группируем сообщения по chat_id
-        const messagesByChatId: Record<number, any> = {};
+        const messagesByChatId: Record<number, IMessage[]> = {};
         for (const message of messages) {
             if (!messagesByChatId[message.chat_id]) {
                 messagesByChatId[message.chat_id] = [];
             }
-
-            messagesByChatId[message.chat_id].push(message);
+            if (message.is_referral_message && message.referral_chat_id) {
+                messagesByChatId[message.referral_chat_id].push(message);
+            } else {
+                messagesByChatId[message.chat_id].push(message);
+            }
         }
 
         // Объединяем данные
@@ -322,7 +325,7 @@ export class ExpressServer {
                     city: user.city,
                     phone: user.phone,
                     balance: message.balance,
-                    is_bonus_accrued: message.is_bonus_accrued,
+                    is_bonus_accrued: message.is_bonus_accrued ?? false,
                 });
             }
 
@@ -338,11 +341,11 @@ export class ExpressServer {
         // Заголовки столбцов
         worksheet.columns = [
             {header: 'Chat ID', key: 'chat_id', width: 15},
-            {header: 'Name', key: 'name', width: 20},
-            {header: 'City', key: 'city', width: 15},
-            {header: 'Phone', key: 'phone', width: 15},
-            {header: 'Balance', key: 'balance', width: 20},
-            {header: 'Bonus accrued', key: 'bonus_flags', width: 15},
+            {header: 'Тег', key: 'name', width: 20},
+            {header: 'Город', key: 'city', width: 15},
+            {header: 'Номер телефона', key: 'phone', width: 15},
+            {header: 'Количество бонусов', key: 'balance', width: 20},
+            {header: 'Статус', key: 'bonus_flags', width: 15},
         ];
 
         // Добавляем данные
