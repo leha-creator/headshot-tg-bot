@@ -57,7 +57,12 @@
     </div>
 
     <div id="statsContainer" style="display: none;">
-        <h2 class="mb-4">Результаты</h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Результаты</h2>
+            <button id="downloadBtn" class="btn btn-success">
+                <i class="bi bi-download"></i> Скачать сообщения пользователей
+            </button>
+        </div>
 
         <div class="row">
             <div class="col-md-6">
@@ -142,6 +147,28 @@
         // Скрыть спиннер загрузки
         document.getElementById('loadingSpinner').style.display = 'none';
 
+    });
+
+    // Обработчик для кнопки скачивания
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+            alert('Пожалуйста, сначала загрузите данные, указав даты');
+            return;
+        }
+
+        // Создаем URL для скачивания с параметрами
+        const downloadUrl = `/download-users-messages?start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`;
+
+        // Создаем временную ссылку для скачивания
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `users_${startDate}_to_${endDate}.xlsx`; // или другой формат
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     });
 
     function displayStats(data) {
