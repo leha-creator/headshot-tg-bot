@@ -304,12 +304,17 @@ export class ExpressServer {
         // Группируем сообщения по chat_id
         const messagesByChatId: Record<number, IMessage[]> = {};
         for (const message of messages) {
-            if (!messagesByChatId[message.chat_id]) {
-                messagesByChatId[message.chat_id] = [];
-            }
             if (message.is_referral_message && message.referral_chat_id) {
+                if (!messagesByChatId[message.referral_chat_id]) {
+                    messagesByChatId[message.referral_chat_id] = [];
+                }
+
                 messagesByChatId[message.referral_chat_id].push(message);
             } else {
+                if (!messagesByChatId[message.chat_id]) {
+                    messagesByChatId[message.chat_id] = [];
+                }
+
                 messagesByChatId[message.chat_id].push(message);
             }
         }
