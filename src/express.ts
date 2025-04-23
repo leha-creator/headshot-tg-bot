@@ -287,7 +287,7 @@ export class ExpressServer {
     async getCombinedUserMessagesData(startDate: string, endDate: string) {
         // Получаем пользователей
         const User = model("User", UserSchema);
-        const users = await User.find();
+        const users = await User.find({});
 
         // Получаем сообщения
         const messagesByChatId = this.getMessages(startDate, endDate);
