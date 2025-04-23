@@ -13,12 +13,14 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
+
         .bonus-item {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #eee;
         }
+
         .chart-container {
             height: 300px;
             margin-top: 20px;
@@ -41,7 +43,7 @@
                         <label for="endDate" class="form-label">Дата окончания</label>
                         <input type="date" class="form-control" id="endDate" required>
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
                         <button type="submit" class="btn btn-primary w-100">Отправить</button>
                         <button id="downloadBtn" class="btn btn-success">
                             <i class="bi bi-download"></i> Выгрузить таблицу
@@ -150,7 +152,7 @@
     });
 
     // Обработчик для кнопки скачивания
-    document.getElementById('downloadBtn').addEventListener('click', function() {
+    document.getElementById('downloadBtn').addEventListener('click', function () {
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
 
