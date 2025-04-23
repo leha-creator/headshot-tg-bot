@@ -429,6 +429,7 @@ export class ExpressServer {
             {header: 'Тег', key: 'name', width: 20},
             {header: 'Город', key: 'city', width: 15},
             {header: 'Номер телефона', key: 'phone', width: 15},
+            {header: 'Тип', key: 'type', width: 20},
             {header: 'Количество бонусов', key: 'balance', width: 20},
             {header: 'Статус', key: 'bonus_flags', width: 15},
         ];
@@ -440,6 +441,7 @@ export class ExpressServer {
                 name: row.name,
                 city: row.city,
                 phone: row.phone,
+                type: row.type,
                 balance: row.balance,
                 bonus_flags: row.is_bonus_accrued ? 'Начислено' : '',
             });
