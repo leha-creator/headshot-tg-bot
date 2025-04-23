@@ -8,6 +8,7 @@ import {ConfigService} from "./config/configService";
 import {SnakeBonusSchema, ISnakeBonus} from "./Models/SnakeBonus.model";
 import cors, {CorsOptions} from 'cors';
 import ExcelJS from 'exceljs';
+import {DailyBoxSchema, IDailyBox} from "./Models/DailyBox.model";
 
 interface CombinedData {
     chat_id: number;
@@ -16,6 +17,7 @@ interface CombinedData {
     phone: number | undefined;
     balance: number;
     is_bonus_accrued: boolean;
+    type: string;
 }
 
 export class ExpressServer {
@@ -285,14 +287,61 @@ export class ExpressServer {
     async getCombinedUserMessagesData(startDate: string, endDate: string) {
         // Получаем пользователей
         const User = model("User", UserSchema);
-        const users = await User.find({
-            createdAt: {
-                $gte: startDate,
-                $lte: endDate
-            },
-        });
+        const users = await User.find();
 
         // Получаем сообщения
+        const messagesByChatId = this.getMessages(startDate, endDate);
+        const dailyBoxesByChatId = this.getDailyBoxes(startDate, endDate);
+        const snakesByChatId = this.getSnakes(startDate, endDate);
+
+
+        // Объединяем данные
+        const combinedData: CombinedData[] = [];
+        for (const user of users) {
+            const userMessages = messagesByChatId[user.chat_id] || [];
+            for (const message of userMessages) {
+                combinedData.push({
+                    chat_id: user.chat_id,
+                    name: user.name,
+                    city: user.city,
+                    phone: user.phone,
+                    balance: message.balance,
+                    is_bonus_accrued: message.is_bonus_accrued ?? false,
+                    type: 'Регистрация'
+                });
+            }
+
+            const userBoxes = dailyBoxesByChatId[user.chat_id] || [];
+            for (const box of userBoxes) {
+                combinedData.push({
+                    chat_id: user.chat_id,
+                    name: user.name,
+                    city: user.city,
+                    phone: user.phone,
+                    balance: box.code,
+                    is_bonus_accrued: box.is_bonus_accrued ?? false,
+                    type: 'Рундук'
+                });
+            }
+
+            const snakes = snakesByChatId[user.chat_id] || [];
+            for (const snake of snakes) {
+                combinedData.push({
+                    chat_id: user.chat_id,
+                    name: user.name,
+                    city: user.city,
+                    phone: user.phone,
+                    balance: snake.bonusScore,
+                    is_bonus_accrued: snake.is_bonus_accrued ?? false,
+                    type: 'Змейка'
+                });
+            }
+        }
+
+        return combinedData;
+    }
+
+    async getMessages(startDate: string, endDate: string) {
         const Message = model("Message", MessageSchema);
         const messages: IMessage[] = await Message.find({
             createdAt: {
@@ -301,7 +350,6 @@ export class ExpressServer {
             },
         });
 
-        // Группируем сообщения по chat_id
         const messagesByChatId: Record<number, IMessage[]> = {};
         for (const message of messages) {
             if (message.is_referral_message && message.referral_chat_id) {
@@ -319,24 +367,50 @@ export class ExpressServer {
             }
         }
 
-        // Объединяем данные
-        const combinedData: CombinedData[] = [];
-        for (const user of users) {
-            const userMessages = messagesByChatId[user.chat_id] || [];
-            for (const message of userMessages) {
-                combinedData.push({
-                    chat_id: user.chat_id,
-                    name: user.name,
-                    city: user.city,
-                    phone: user.phone,
-                    balance: message.balance,
-                    is_bonus_accrued: message.is_bonus_accrued ?? false,
-                });
+        return messagesByChatId;
+    }
+
+    async getDailyBoxes(startDate: string, endDate: string) {
+        const DailyBox = model("DailyBox", DailyBoxSchema);
+        const daily_boxes: IDailyBox[] = await DailyBox.find({
+            createdAt: {
+                $gte: startDate,
+                $lte: endDate
+            },
+        });
+
+        const dailyBoxesByChatId: Record<number, IDailyBox[]> = {};
+        for (const daily_box of daily_boxes) {
+
+            if (!dailyBoxesByChatId[daily_box.chat_id]) {
+                dailyBoxesByChatId[daily_box.chat_id] = [];
             }
 
+            dailyBoxesByChatId[daily_box.chat_id].push(daily_box);
         }
 
-        return combinedData;
+        return dailyBoxesByChatId;
+    }
+
+    async getSnakes(startDate: string, endDate: string) {
+        const SnakeBonus = model("SnakeBonus", SnakeBonusSchema);
+        const snakeBonuses: ISnakeBonus[] = await SnakeBonus.find({
+            createdAt: {
+                $gte: startDate,
+                $lte: endDate
+            },
+        });
+
+        const snakeBonusesByChatId: Record<number, ISnakeBonus[]> = {};
+        for (const snakeBonus of snakeBonuses) {
+            if (!snakeBonusesByChatId[snakeBonus.chat_id]) {
+                snakeBonusesByChatId[snakeBonus.chat_id] = [];
+            }
+
+            snakeBonusesByChatId[snakeBonus.chat_id].push(snakeBonus);
+        }
+
+        return snakeBonusesByChatId;
     }
 
     async createExcelFile(data: CombinedData[]) {
