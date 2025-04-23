@@ -341,11 +341,11 @@ export class ExpressServer {
         // Заголовки столбцов
         worksheet.columns = [
             {header: 'Chat ID', key: 'chat_id', width: 15},
-            {header: 'Name', key: 'name', width: 20},
-            {header: 'City', key: 'city', width: 15},
-            {header: 'Phone', key: 'phone', width: 15},
-            {header: 'Balance', key: 'balance', width: 20},
-            {header: 'Bonus accrued', key: 'bonus_flags', width: 15},
+            {header: 'Тег', key: 'name', width: 20},
+            {header: 'Город', key: 'city', width: 15},
+            {header: 'Номер телефона', key: 'phone', width: 15},
+            {header: 'Количество бонусов', key: 'balance', width: 20},
+            {header: 'Статус', key: 'bonus_flags', width: 15},
         ];
 
         // Добавляем данные
