@@ -43,6 +43,9 @@ import {UnmodCommand} from "./commands/unmod.command";
 import {logger} from "./helpers/logger";
 import {SnakeBonusAccruedAction} from "./actions/snake_bonuses_accrued.action";
 import {RefCommand} from "./commands/ref.command";
+import {ActionCommand} from "./commands/action.command";
+import {ActionWin25Action} from "./actions/actionwin25.action";
+import {ActionBonusAccruedAction} from "./actions/action_bonus_accrued.action";
 
 export class Bot {
     bot: Telegraf<IBotContext>;
@@ -149,6 +152,7 @@ export class Bot {
             new MenuCommand(this.bot),
             new ContactSelectClubAction(this.bot),
             new RefCommand(this.bot),
+            new ActionCommand(this.bot, this.adminService),
             new MessageCommands(this.bot),
         ];
 
@@ -173,6 +177,8 @@ export class Bot {
             new ContactsAction(this.bot),
             new ContactSelectClubAction(this.bot),
             new RegisterAction(this.bot),
+            new ActionWin25Action(this.bot),
+            new ActionBonusAccruedAction(this.bot),
             new ChestBonusAccruedAction(this.bot),
         ];
 
