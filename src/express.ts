@@ -9,6 +9,7 @@ import {SnakeBonusSchema, ISnakeBonus} from "./Models/SnakeBonus.model";
 import cors, {CorsOptions} from 'cors';
 import ExcelJS from 'exceljs';
 import {DailyBoxSchema, IDailyBox} from "./Models/DailyBox.model";
+import {ActionSchema, IAction} from "./Models/Action.model";
 
 interface CombinedData {
     chat_id: number;
@@ -293,6 +294,7 @@ export class ExpressServer {
         const messagesByChatId = await this.getMessages(startDate, endDate);
         const dailyBoxesByChatId = await this.getDailyBoxes(startDate, endDate);
         const snakesByChatId = await this.getSnakes(startDate, endDate);
+        const actionsByChatId = await this.getActions(startDate, endDate);
 
 
         // Объединяем данные
@@ -334,6 +336,19 @@ export class ExpressServer {
                     balance: snake.bonusScore,
                     is_bonus_accrued: snake.is_bonus_accrued ?? false,
                     type: 'Змейка'
+                });
+            }
+
+            const actions = actionsByChatId[user.chat_id] || [];
+            for (const action of actions) {
+                combinedData.push({
+                    chat_id: user.chat_id,
+                    name: user.name,
+                    city: user.city,
+                    phone: user.phone,
+                    balance: action.balance,
+                    is_bonus_accrued: action.is_bonus_accrued ?? false,
+                    type: 'Акция'
                 });
             }
         }
@@ -417,6 +432,27 @@ export class ExpressServer {
         }
 
         return snakeBonusesByChatId;
+    }
+
+    async getActions(startDate: string, endDate: string) {
+        const Action = model("Action", ActionSchema);
+        const actions: IAction[] = await Action.find({
+            createdAt: {
+                $gte: startDate,
+                $lte: endDate
+            },
+        });
+
+        const actionsByChatId: Record<number, IAction[]> = {};
+        for (const action of actions) {
+            if (!actionsByChatId[action.chat_id]) {
+                actionsByChatId[action.chat_id] = [];
+            }
+
+            actionsByChatId[action.chat_id].push(action);
+        }
+
+        return actionsByChatId;
     }
 
     async createExcelFile(data: CombinedData[]) {
