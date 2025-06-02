@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Статистика по датам</title>
     <!-- Bootstrap CSS -->
-    <link href="http://89.104.69.63:8443/bootstrap.min.css" rel="stylesheet">
+    <link href="http://91.197.96.160:8443/bootstrap.min.css" rel="stylesheet">
     <style>
         .stat-card {
             margin-bottom: 20px;
@@ -108,8 +108,8 @@
 </div>
 
 <!-- Bootstrap JS и Chart.js -->
-<script src="http://89.104.69.63:8443/bootstrap.bundle.min.js"></script>
-<script src="http://89.104.69.63:8443/chart.js"></script>
+<script src="http://91.197.96.160:8443/bootstrap.bundle.min.js"></script>
+<script src="http://91.197.96.160:8443/chart.js"></script>
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
@@ -135,7 +135,7 @@
             start_date: startDate,
             end_date: endDate,
         }
-        const response = await fetch('http://89.104.69.63:8443/stats', {
+        const response = await fetch('http://91.197.96.160:8443/stats', {
             method: 'POST',
             headers: {
                 'content-type': 'application/json;charset=UTF-8',
